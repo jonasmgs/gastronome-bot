@@ -11,11 +11,22 @@ serve(async (req) => {
   }
 
   try {
-    const { ingredients } = await req.json();
+    const body = await req.json();
+    const { ingredients, mode, filters, existing_recipe } = body;
 
-    if (!ingredients || !Array.isArray(ingredients) || ingredients.length < 2) {
+    // mode: "generate" (default) | "transform"
+    const isTransform = mode === 'transform';
+
+    if (!isTransform && (!ingredients || !Array.isArray(ingredients) || ingredients.length < 2)) {
       return new Response(
         JSON.stringify({ error: 'Envie pelo menos 2 ingredientes' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (isTransform && !existing_recipe) {
+      return new Response(
+        JSON.stringify({ error: 'Envie a receita para transformar' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -28,14 +39,43 @@ serve(async (req) => {
       );
     }
 
-    const prompt = `Você é um chef profissional renomado e nutricionista certificado.
+    // Build dietary filter instructions
+    const activeFilters: string[] = [];
+    if (filters?.vegan) activeFilters.push('VEGANA (sem nenhum ingrediente de origem animal)');
+    if (filters?.glutenFree) activeFilters.push('SEM GLÚTEN (substitua qualquer ingrediente com glúten por alternativas sem glúten)');
+    if (filters?.lactoseFree) activeFilters.push('SEM LACTOSE (substitua qualquer ingrediente com lactose por alternativas sem lactose)');
+
+    const filterInstructions = activeFilters.length > 0
+      ? `\n\nFILTROS OBRIGATÓRIOS - A receita DEVE ser:\n${activeFilters.map(f => `- ${f}`).join('\n')}\n\nSubstitua ingredientes incompatíveis por alternativas adequadas. Mencione as substituições feitas.`
+      : '';
+
+    let prompt: string;
+
+    if (isTransform) {
+      prompt = `Você é um chef profissional renomado e nutricionista certificado.
+
+Transforme a seguinte receita aplicando os filtros dietéticos:
+
+RECEITA ORIGINAL:
+${existing_recipe}
+${filterInstructions}
+
+Crie a versão transformada da receita mantendo o sabor o mais próximo possível do original.
+
+Retorne exclusivamente em JSON válido, sem texto adicional.`;
+    } else {
+      prompt = `Você é um chef profissional renomado e nutricionista certificado.
 
 Com base nos seguintes ingredientes:
 ${ingredients.join(', ')}
+${filterInstructions}
 
 Crie apenas UMA receita completa e MUITO detalhada.
 
-Retorne exclusivamente em JSON válido, sem texto adicional.
+Retorne exclusivamente em JSON válido, sem texto adicional.`;
+    }
+
+    prompt += `
 
 Formato obrigatório:
 
@@ -45,6 +85,7 @@ Formato obrigatório:
   "prep_time": "",
   "cook_time": "",
   "servings": 0,
+  "dietary_tags": [],
   "ingredients": [
     {
       "name": "",
@@ -64,7 +105,8 @@ Formato obrigatório:
   ],
   "calories_total": 0,
   "nutrition_info": "",
-  "chef_tips": ""
+  "chef_tips": "",
+  "substitutions_made": ""
 }
 
 Regras:
@@ -73,12 +115,14 @@ Regras:
 - Calcular total corretamente
 - O campo "steps" deve ter pelo menos 4-6 passos detalhados
 - Cada passo deve ter título curto, descrição detalhada com técnicas culinárias, duração estimada e uma dica opcional
-- Cada ingrediente pode ter uma dica de preparo opcional (ex: "corte em cubos pequenos")
+- Cada ingrediente pode ter uma dica de preparo opcional
 - Incluir tempo de preparo e cozimento
 - Incluir número de porções
 - Incluir dificuldade (Fácil, Médio ou Difícil)
-- O campo "chef_tips" deve conter 2-3 dicas profissionais para melhorar o resultado
-- O campo "nutrition_info" deve detalhar macronutrientes (proteínas, carboidratos, gorduras, fibras)
+- O campo "dietary_tags" deve listar os filtros aplicados (ex: ["Vegana", "Sem Glúten"])
+- O campo "chef_tips" deve conter 2-3 dicas profissionais
+- O campo "nutrition_info" deve detalhar macronutrientes
+- O campo "substitutions_made" deve listar as substituições feitas (se houver filtros aplicados), ou string vazia
 - Não escrever nada fora do JSON`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -107,7 +151,6 @@ Regras:
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
 
-    // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return new Response(
