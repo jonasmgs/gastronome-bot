@@ -72,14 +72,14 @@ const Auth = () => {
             key={currentBg}
             src={bgImages[currentBg]}
             alt=""
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 0.4, scale: 1 }}
+            initial={{ opacity: 0, scale: 1.02 }}
+            animate={{ opacity: 0.55, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5 }}
             className="absolute inset-0 h-full w-full object-cover"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/40 to-background/70" />
       </div>
 
       <motion.div
