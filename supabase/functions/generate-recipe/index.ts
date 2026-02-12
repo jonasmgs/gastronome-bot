@@ -72,7 +72,11 @@ RECEITA ORIGINAL:
 ${existing_recipe}
 ${filterInstructions}
 
-Crie a versão transformada da receita mantendo o sabor o mais próximo possível do original.
+REGRAS IMPORTANTES:
+- Crie um NOVO NOME criativo para a receita transformada que reflita as mudanças (ex: se virou vegana, o nome deve indicar isso)
+- O nome NÃO pode ser igual ao original
+- MANTENHA A MESMA CATEGORIA da receita original: se é um prato salgado, a versão transformada DEVE continuar sendo salgada. Se é uma sobremesa/doce, DEVE continuar sendo sobremesa/doce. NUNCA transforme um prato salgado em doce ou vice-versa.
+- Mantenha o sabor e a essência o mais próximo possível do original, apenas substituindo os ingredientes incompatíveis
 
 Retorne exclusivamente em JSON válido, sem texto adicional.`;
     } else {
