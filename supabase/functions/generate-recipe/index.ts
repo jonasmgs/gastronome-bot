@@ -28,12 +28,12 @@ serve(async (req) => {
       );
     }
 
-    const prompt = `Você é um chef profissional e nutricionista.
+    const prompt = `Você é um chef profissional renomado e nutricionista certificado.
 
 Com base nos seguintes ingredientes:
 ${ingredients.join(', ')}
 
-Crie apenas UMA receita completa.
+Crie apenas UMA receita completa e MUITO detalhada.
 
 Retorne exclusivamente em JSON válido, sem texto adicional.
 
@@ -41,23 +41,44 @@ Formato obrigatório:
 
 {
   "recipe_name": "",
+  "difficulty": "Fácil" | "Médio" | "Difícil",
+  "prep_time": "",
+  "cook_time": "",
+  "servings": 0,
   "ingredients": [
     {
       "name": "",
       "quantity": "",
-      "calories": 0
+      "calories": 0,
+      "tip": ""
     }
   ],
-  "preparation": "",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "",
+      "description": "",
+      "duration": "",
+      "tip": ""
+    }
+  ],
   "calories_total": 0,
-  "nutrition_info": ""
+  "nutrition_info": "",
+  "chef_tips": ""
 }
 
 Regras:
-- Criar nome criativo
-- Estimar calorias realistas
+- Criar nome criativo e atraente
+- Estimar calorias realistas por ingrediente
 - Calcular total corretamente
-- Modo de preparo detalhado
+- O campo "steps" deve ter pelo menos 4-6 passos detalhados
+- Cada passo deve ter título curto, descrição detalhada com técnicas culinárias, duração estimada e uma dica opcional
+- Cada ingrediente pode ter uma dica de preparo opcional (ex: "corte em cubos pequenos")
+- Incluir tempo de preparo e cozimento
+- Incluir número de porções
+- Incluir dificuldade (Fácil, Médio ou Difícil)
+- O campo "chef_tips" deve conter 2-3 dicas profissionais para melhorar o resultado
+- O campo "nutrition_info" deve detalhar macronutrientes (proteínas, carboidratos, gorduras, fibras)
 - Não escrever nada fora do JSON`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -70,7 +91,7 @@ Regras:
         model: 'llama-3.1-8b-instant',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        max_tokens: 1024,
+        max_tokens: 2048,
       }),
     });
 
