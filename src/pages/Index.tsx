@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Sparkles, Loader2, UtensilsCrossed } from 'lucide-react';
@@ -9,6 +9,12 @@ import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '@/components/BottomNav';
 import IngredientCard from '@/components/IngredientCard';
 import bgIngredients from '@/assets/bg-ingredients.jpg';
+import bgIngredients2 from '@/assets/bg-ingredients-2.jpg';
+import bgIngredients3 from '@/assets/bg-ingredients-3.jpg';
+import bgIngredients4 from '@/assets/bg-ingredients-4.jpg';
+import bgUtensils from '@/assets/bg-utensils.jpg';
+
+const bgImages = [bgIngredients, bgIngredients2, bgIngredients3, bgIngredients4, bgUtensils];
 
 const Index = () => {
   const { user } = useAuth();
@@ -17,6 +23,15 @@ const Index = () => {
   const [ingredient, setIngredient] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [currentBg, setCurrentBg] = useState(0);
+
+  // Auto-rotate background every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % bgImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const addIngredient = () => {
     const trimmed = ingredient.trim();
@@ -49,7 +64,6 @@ const Index = () => {
       if (error) throw error;
 
       const recipe = data;
-      // Build preparation text from steps if available
       const preparation = recipe.steps
         ? recipe.steps.map((s: any) => `${s.step_number}. ${s.title}: ${s.description}`).join('\n\n')
         : recipe.preparation || '';
@@ -81,11 +95,22 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 relative">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img src={bgIngredients} alt="" className="h-64 w-full object-cover opacity-20" />
-        <div className="absolute inset-0 h-64 bg-gradient-to-b from-transparent to-background" />
+    <div className="min-h-screen bg-background pb-24 relative overflow-hidden">
+      {/* Rotating Background Images */}
+      <div className="absolute inset-0 z-0 h-80">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentBg}
+            src={bgImages[currentBg]}
+            alt=""
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.45 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2 }}
+            className="absolute inset-0 h-80 w-full object-cover"
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 h-80 bg-gradient-to-b from-background/30 via-background/60 to-background" />
       </div>
 
       <div className="relative z-10">
@@ -111,7 +136,7 @@ const Index = () => {
               onChange={(e) => setIngredient(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Digite um ingrediente..."
-              className="flex-1 rounded-xl border border-input bg-card py-3 px-4 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="flex-1 rounded-xl border border-input bg-card/90 backdrop-blur-sm py-3 px-4 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <button
               onClick={addIngredient}
