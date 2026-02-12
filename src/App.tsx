@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import MyRecipes from "./pages/MyRecipes";
 import RecipeResult from "./pages/RecipeResult";
+import EditRecipe from "./pages/EditRecipe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const AppRoutes = () => {
       <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
       <Route path="/recipes" element={<ProtectedRoute><MyRecipes /></ProtectedRoute>} />
       <Route path="/recipe/:id" element={<ProtectedRoute><RecipeResult /></ProtectedRoute>} />
+      <Route path="/edit-recipe" element={<ProtectedRoute><EditRecipe /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
