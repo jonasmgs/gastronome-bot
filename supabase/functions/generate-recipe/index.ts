@@ -180,27 +180,47 @@ Regras:
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
 
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('No JSON found in AI response:', content);
-      return new Response(
-        JSON.stringify({ error: 'Resposta inválida da IA' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Robust JSON extraction from AI response
+    function extractJsonFromResponse(raw: string): Record<string, unknown> {
+      let cleaned = raw
+        .replace(/```json\s*/gi, '')
+        .replace(/```\s*/g, '')
+        .trim();
 
-    // Clean common JSON issues from AI responses
-    let jsonStr = jsonMatch[0];
-    // Remove trailing commas before } or ]
-    jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1');
-    // Remove control characters
-    jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch) => ch === '\n' || ch === '\r' || ch === '\t' ? ch : '');
+      const jsonStart = cleaned.indexOf('{');
+      const jsonEnd = cleaned.lastIndexOf('}');
+
+      if (jsonStart === -1 || jsonEnd === -1) {
+        console.error('No JSON found in AI response:', cleaned.substring(0, 300));
+        throw new Error('No JSON object found');
+      }
+
+      cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
+
+      try {
+        return JSON.parse(cleaned);
+      } catch (_e) {
+        // Repair common issues
+        cleaned = cleaned
+          .replace(/,\s*}/g, '}')
+          .replace(/,\s*]/g, ']')
+          .replace(/[\x00-\x1F\x7F]/g, (ch) => ch === '\n' || ch === '\r' || ch === '\t' ? ch : '')
+          .replace(/\n/g, ' ')
+          .replace(/\t/g, ' ');
+
+        try {
+          return JSON.parse(cleaned);
+        } catch (repairErr) {
+          console.error('JSON repair failed:', repairErr, 'Raw:', cleaned.substring(0, 500));
+          throw repairErr;
+        }
+      }
+    }
 
     let recipe: Record<string, unknown>;
     try {
-      recipe = JSON.parse(jsonStr);
-    } catch (parseErr) {
-      console.error('JSON parse error:', parseErr, 'Raw:', jsonStr.substring(0, 500));
+      recipe = extractJsonFromResponse(content);
+    } catch (_parseErr) {
       return new Response(
         JSON.stringify({ error: 'A IA retornou dados inválidos. Tente novamente.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
