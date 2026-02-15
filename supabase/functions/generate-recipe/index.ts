@@ -182,13 +182,30 @@ Regras:
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('No JSON found in AI response:', content);
       return new Response(
         JSON.stringify({ error: 'Resposta inválida da IA' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const recipe = JSON.parse(jsonMatch[0]);
+    // Clean common JSON issues from AI responses
+    let jsonStr = jsonMatch[0];
+    // Remove trailing commas before } or ]
+    jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1');
+    // Remove control characters
+    jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch) => ch === '\n' || ch === '\r' || ch === '\t' ? ch : '');
+
+    let recipe: Record<string, unknown>;
+    try {
+      recipe = JSON.parse(jsonStr);
+    } catch (parseErr) {
+      console.error('JSON parse error:', parseErr, 'Raw:', jsonStr.substring(0, 500));
+      return new Response(
+        JSON.stringify({ error: 'A IA retornou dados inválidos. Tente novamente.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     return new Response(
       JSON.stringify(recipe),
