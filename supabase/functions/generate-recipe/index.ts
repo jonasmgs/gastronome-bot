@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { ingredients, mode, filters, existing_recipe } = body;
+    const { ingredients, mode, filters, existing_recipe, category } = body;
 
     // mode: "generate" (default) | "transform"
     const isTransform = mode === 'transform';
@@ -56,6 +56,17 @@ serve(async (req) => {
     if (filters?.vegan) activeFilters.push('VEGANA (sem nenhum ingrediente de origem animal)');
     if (filters?.glutenFree) activeFilters.push('SEM GLÚTEN (substitua qualquer ingrediente com glúten por alternativas sem glúten)');
     if (filters?.lactoseFree) activeFilters.push('SEM LACTOSE (substitua qualquer ingrediente com lactose por alternativas sem lactose)');
+
+    const categoryMap: Record<string, string> = {
+      salada: 'SALADA (prato leve, fresco, à base de vegetais e folhas)',
+      sobremesa: 'SOBREMESA/DOCE (prato doce, pode ser bolo, mousse, pudim, etc.)',
+      salgado: 'PRATO SALGADO (refeição principal, prato quente e substancioso)',
+      lanche: 'LANCHE/SNACK (prato rápido, sanduíche, wrap, petisco)',
+    };
+
+    const categoryInstruction = category && categoryMap[category]
+      ? `\n\nCATEGORIA OBRIGATÓRIA: A receita DEVE ser do tipo ${categoryMap[category]}. Não crie uma receita de outra categoria.`
+      : '';
 
     const filterInstructions = activeFilters.length > 0
       ? `\n\nFILTROS OBRIGATÓRIOS - A receita DEVE ser:\n${activeFilters.map(f => `- ${f}`).join('\n')}\n\nSubstitua ingredientes incompatíveis por alternativas adequadas. Mencione as substituições feitas.`
@@ -97,7 +108,7 @@ Retorne exclusivamente em JSON válido, sem texto adicional.`;
 
 Com base nos seguintes ingredientes:
 ${ingredients.join(', ')}
-${filterInstructions}
+${categoryInstruction}${filterInstructions}
 
 Crie apenas UMA receita completa e MUITO detalhada.
 
