@@ -30,8 +30,8 @@ export function validateManifestIcons(): Plugin {
 
       const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
       const icons: { src: string; type?: string }[] = manifest.icons || [];
-      const errors: string[] = [];
       const warnings: string[] = [];
+      let fixed = false;
 
       for (const icon of icons) {
         const filePath = path.resolve('public', icon.src.replace(/^\//, ''));
@@ -48,19 +48,17 @@ export function validateManifestIcons(): Plugin {
         }
 
         if (icon.type && icon.type !== actualType) {
-          errors.push(
-            `❌ Type mismatch for ${icon.src}: manifest declares "${icon.type}" but file is actually "${actualType}"`
-          );
+          console.warn(`\x1b[33m⚠️ Auto-fixing type for ${icon.src}: "${icon.type}" → "${actualType}"\x1b[0m`);
+          icon.type = actualType;
+          fixed = true;
         }
       }
 
       for (const w of warnings) console.warn(`\x1b[33m${w}\x1b[0m`);
-      for (const e of errors) console.error(`\x1b[31m${e}\x1b[0m`);
 
-      if (errors.length > 0) {
-        this.error(
-          `Manifest icon validation failed with ${errors.length} error(s). Fix icon types in public/manifest.json to match actual file formats.`
-        );
+      if (fixed) {
+        fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+        console.log('\x1b[32m✅ Manifest icon types auto-fixed.\x1b[0m');
       }
     },
   };
