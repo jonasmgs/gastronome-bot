@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Sparkles, Loader2, UtensilsCrossed } from 'lucide-react';
+import { Plus, Sparkles, Loader2, UtensilsCrossed, Salad, Cake, Beef, Sandwich } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -23,6 +23,7 @@ const Index = () => {
   const [ingredient, setIngredient] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [category, setCategory] = useState<string | null>(null);
   const [currentBg, setCurrentBg] = useState(0);
 
   // Auto-rotate background every 5 seconds
@@ -59,7 +60,7 @@ const Index = () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
-        body: { ingredients },
+        body: { ingredients, category },
       });
       if (error) throw error;
 
@@ -125,6 +126,32 @@ const Index = () => {
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
             <Sparkles className="h-3 w-3" /> Modo Teste
           </span>
+        </div>
+
+        {/* Category Selector */}
+        <div className="px-5 mb-4">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Tipo de prato</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {[
+              { id: 'salada', label: 'Salada', icon: Salad },
+              { id: 'sobremesa', label: 'Sobremesa', icon: Cake },
+              { id: 'salgado', label: 'Salgado', icon: Beef },
+              { id: 'lanche', label: 'Lanche', icon: Sandwich },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCategory(category === cat.id ? null : cat.id)}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
+                  category === cat.id
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-card/80 backdrop-blur-sm border border-input text-muted-foreground'
+                }`}
+              >
+                <cat.icon className="h-3.5 w-3.5" />
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Ingredient Input */}
