@@ -58,10 +58,10 @@ serve(async (req) => {
     if (filters?.lactoseFree) activeFilters.push('SEM LACTOSE (substitua qualquer ingrediente com lactose por alternativas sem lactose)');
 
     const categoryMap: Record<string, string> = {
-      salada: 'SALADA (prato leve, fresco, à base de vegetais e folhas)',
-      sobremesa: 'SOBREMESA/DOCE (prato doce, pode ser bolo, mousse, pudim, etc.)',
-      salgado: 'PRATO SALGADO (refeição principal, prato quente e substancioso)',
-      lanche: 'LANCHE/SNACK (prato rápido, sanduíche, wrap, petisco)',
+      salada: 'SALADA GOURMET — Prato fresco e sofisticado com base em folhas nobres, vegetais grelhados ou crus, proteínas leves (frango desfiado, camarão, ovo pochê), molhos autorais (vinagrete de maracujá, tahine, mostarda e mel). Deve ser visualmente bonita, com texturas contrastantes (crocante + macio) e temperos frescos.',
+      sobremesa: 'SOBREMESA/DOCE DE CONFEITARIA — Receita doce elaborada como bolo, torta, mousse, pudim, cheesecake, brownie, pavê, sorvete caseiro, crème brûlée ou similar. Deve ter camadas de sabor, boa apresentação e técnicas de confeitaria (banho-maria, chantilly, calda, cobertura, etc).',
+      salgado: 'PRATO PRINCIPAL SALGADO — Refeição completa e substanciosa como risoto, massa, carne assada, estrogonofe, moqueca, escondidinho, lasanha, frango recheado, etc. Deve ser um prato quente, reconfortante e digno de restaurante.',
+      lanche: 'LANCHE ELABORADO — Sanduíche gourmet, hambúrguer artesanal, wrap recheado, bruschetta, croissant recheado, panini, taco, quesadilla ou similar. NÃO pode ser apenas ingredientes simples empilhados. Deve ter molho especial, combinação criativa de sabores e montagem caprichada.',
     };
 
     const categoryInstruction = category && categoryMap[category]
@@ -150,7 +150,10 @@ Formato obrigatório:
 }
 
 Regras:
-- Criar nome criativo e atraente
+- Criar nome criativo e atraente, digno de cardápio de restaurante
+- A receita deve ser ELABORADA e SABOROSA, nunca simplista ou amadora
+- Use combinações de ingredientes que façam sentido gastronômico
+- Inclua molhos, temperos e técnicas que elevem o prato
 - Estimar calorias realistas por ingrediente
 - Calcular total corretamente
 - O campo "steps" deve ter pelo menos 4-6 passos detalhados
