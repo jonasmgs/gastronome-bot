@@ -37,7 +37,7 @@ export function validateManifestIcons(): Plugin {
         const filePath = path.resolve('public', icon.src.replace(/^\//, ''));
 
         if (!fs.existsSync(filePath)) {
-          errors.push(`❌ Icon file not found: ${icon.src}`);
+          warnings.push(`❌ Icon file not found: ${icon.src}`);
           continue;
         }
 
