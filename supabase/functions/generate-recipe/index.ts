@@ -29,19 +29,51 @@ serve(async (req) => {
     // mode: "generate" (default) | "transform"
     const isTransform = mode === 'transform';
 
-    if (!isTransform && (!ingredients || !Array.isArray(ingredients) || ingredients.length < 2)) {
-      return new Response(
-        JSON.stringify({ error: 'Envie pelo menos 2 ingredientes' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    let sanitizedIngredients: string[] = [];
+
+    if (!isTransform) {
+      if (!ingredients || !Array.isArray(ingredients) || ingredients.length < 2) {
+        return new Response(
+          JSON.stringify({ error: 'Envie pelo menos 2 ingredientes' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Validate and sanitize each ingredient
+      sanitizedIngredients = ingredients
+        .filter((ing: unknown) => typeof ing === 'string')
+        .map((ing: string) => ing.trim().replace(/[^\p{L}\p{N}\s\-,.'()áàâãéèêíïóôõúüçñ]/gu, ''))
+        .filter((ing: string) => ing.length > 0 && ing.length <= 100)
+        .slice(0, 20);
+
+      if (sanitizedIngredients.length < 2) {
+        return new Response(
+          JSON.stringify({ error: 'Ingredientes inválidos' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
-    if (isTransform && !existing_recipe) {
-      return new Response(
-        JSON.stringify({ error: 'Envie a receita para transformar' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (isTransform) {
+      if (!existing_recipe || typeof existing_recipe !== 'string') {
+        return new Response(
+          JSON.stringify({ error: 'Envie a receita para transformar' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (existing_recipe.length > 5000) {
+        return new Response(
+          JSON.stringify({ error: 'Receita muito longa' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
+
+    // Validate category and complexity against allowed values
+    const allowedCategories = ['salada', 'sobremesa', 'salgado', 'lanche'];
+    const allowedComplexities = ['simples', 'media', 'elaborada'];
+    const safeCategory = (typeof category === 'string' && allowedCategories.includes(category)) ? category : null;
+    const safeComplexity = (typeof complexity === 'string' && allowedComplexities.includes(complexity)) ? complexity : null;
 
     const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
     if (!GROQ_API_KEY) {
@@ -64,8 +96,8 @@ serve(async (req) => {
       lanche: 'LANCHE ELABORADO — Sanduíche gourmet, hambúrguer artesanal, wrap recheado, bruschetta, croissant recheado, panini, taco, quesadilla ou similar. NÃO pode ser apenas ingredientes simples empilhados. Deve ter molho especial, combinação criativa de sabores e montagem caprichada.',
     };
 
-    const categoryInstruction = category && categoryMap[category]
-      ? `\n\nCATEGORIA OBRIGATÓRIA: A receita DEVE ser do tipo ${categoryMap[category]}. Não crie uma receita de outra categoria.`
+    const categoryInstruction = safeCategory && categoryMap[safeCategory]
+      ? `\n\nCATEGORIA OBRIGATÓRIA: A receita DEVE ser do tipo ${categoryMap[safeCategory]}. Não crie uma receita de outra categoria.`
       : '';
 
     const complexityMap: Record<string, string> = {
@@ -74,8 +106,8 @@ serve(async (req) => {
       elaborada: 'RECEITA ELABORADA — Ingredientes sofisticados, preparo demorado (45+ min), técnicas avançadas de alta gastronomia (selar, flambar, reduzir, confitar, sous vide). Apresentação refinada, molhos autorais, 7-10 passos detalhados.',
     };
 
-    const complexityInstruction = complexity && complexityMap[complexity]
-      ? `\n\nCOMPLEXIDADE OBRIGATÓRIA: ${complexityMap[complexity]}`
+    const complexityInstruction = safeComplexity && complexityMap[safeComplexity]
+      ? `\n\nCOMPLEXIDADE OBRIGATÓRIA: ${complexityMap[safeComplexity]}`
       : '';
 
     const filterInstructions = activeFilters.length > 0
@@ -117,7 +149,7 @@ Retorne exclusivamente em JSON válido, sem texto adicional.`;
       prompt = `${chefPersona}
 
 Com base nos seguintes ingredientes:
-${ingredients.join(', ')}
+${sanitizedIngredients.join(', ')}
 ${categoryInstruction}${complexityInstruction}${filterInstructions}
 
 Crie apenas UMA receita completa e MUITO detalhada.
