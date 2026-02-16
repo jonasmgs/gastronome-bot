@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { ingredients, mode, filters, existing_recipe, category } = body;
+    const { ingredients, mode, filters, existing_recipe, category, complexity } = body;
 
     // mode: "generate" (default) | "transform"
     const isTransform = mode === 'transform';
@@ -68,6 +68,16 @@ serve(async (req) => {
       ? `\n\nCATEGORIA OBRIGATÓRIA: A receita DEVE ser do tipo ${categoryMap[category]}. Não crie uma receita de outra categoria.`
       : '';
 
+    const complexityMap: Record<string, string> = {
+      simples: 'RECEITA SIMPLES — Poucos ingredientes, preparo rápido (até 20 min), técnicas básicas do dia a dia, ideal para quem tem pouca experiência na cozinha. Máximo 4-5 passos.',
+      media: 'RECEITA DE COMPLEXIDADE MÉDIA — Ingredientes variados, preparo moderado (20-45 min), algumas técnicas intermediárias (refogar, gratinar, montar camadas). Entre 5-7 passos.',
+      elaborada: 'RECEITA ELABORADA — Ingredientes sofisticados, preparo demorado (45+ min), técnicas avançadas de alta gastronomia (selar, flambar, reduzir, confitar, sous vide). Apresentação refinada, molhos autorais, 7-10 passos detalhados.',
+    };
+
+    const complexityInstruction = complexity && complexityMap[complexity]
+      ? `\n\nCOMPLEXIDADE OBRIGATÓRIA: ${complexityMap[complexity]}`
+      : '';
+
     const filterInstructions = activeFilters.length > 0
       ? `\n\nFILTROS OBRIGATÓRIOS - A receita DEVE ser:\n${activeFilters.map(f => `- ${f}`).join('\n')}\n\nSubstitua ingredientes incompatíveis por alternativas adequadas. Mencione as substituições feitas.`
       : '';
@@ -108,7 +118,7 @@ Retorne exclusivamente em JSON válido, sem texto adicional.`;
 
 Com base nos seguintes ingredientes:
 ${ingredients.join(', ')}
-${categoryInstruction}${filterInstructions}
+${categoryInstruction}${complexityInstruction}${filterInstructions}
 
 Crie apenas UMA receita completa e MUITO detalhada.
 

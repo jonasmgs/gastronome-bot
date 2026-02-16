@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Sparkles, Loader2, UtensilsCrossed, Salad, Cake, Beef, Sandwich } from 'lucide-react';
+import { Plus, Sparkles, Loader2, UtensilsCrossed, Salad, Cake, Beef, Sandwich, Zap, ChefHat, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,6 +24,7 @@ const Index = () => {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
+  const [complexity, setComplexity] = useState<string | null>(null);
   const [currentBg, setCurrentBg] = useState(0);
 
   // Auto-rotate background every 5 seconds
@@ -60,7 +61,7 @@ const Index = () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
-        body: { ingredients, category },
+        body: { ingredients, category, complexity },
       });
       if (error) throw error;
 
@@ -154,7 +155,30 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Ingredient Input */}
+        {/* Complexity Selector */}
+        <div className="px-5 mb-4">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Complexidade</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {[
+              { id: 'simples', label: 'Simples', icon: Zap },
+              { id: 'media', label: 'Média', icon: ChefHat },
+              { id: 'elaborada', label: 'Elaborada', icon: Crown },
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => setComplexity(complexity === opt.id ? null : opt.id)}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
+                  complexity === opt.id
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-card/80 backdrop-blur-sm border border-input text-muted-foreground'
+                }`}
+              >
+                <opt.icon className="h-3.5 w-3.5" />
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="px-5 mb-4">
           <div className="flex gap-2">
             <input
