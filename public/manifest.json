@@ -1,6 +1,6 @@
 {
-  "name": "Gastronome Bot",
-  "short_name": "Gastronome",
+  "name": "Gastronom.IA",
+  "short_name": "Gastronom.IA",
   "description": "Gerador inteligente de receitas com IA gastronômica profissional",
   "start_url": "/",
   "display": "standalone",
