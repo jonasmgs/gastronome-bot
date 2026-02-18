@@ -1,4 +1,4 @@
-import { Home, BookOpen, LogOut, Wand2 } from 'lucide-react';
+import { Home, BookOpen, LogOut, Wand2, MessageCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -9,6 +9,7 @@ const BottomNav = () => {
 
   const items = [
     { icon: Home, label: 'Home', path: '/' },
+    { icon: MessageCircle, label: 'Chef IA', path: '/chat' },
     { icon: Wand2, label: 'Editar', path: '/edit-recipe' },
     { icon: BookOpen, label: 'Receitas', path: '/recipes' },
   ];
