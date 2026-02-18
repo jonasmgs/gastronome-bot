@@ -12,7 +12,6 @@ serve(async (req) => {
   }
 
   try {
-    // Auth check
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Não autorizado' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -23,9 +22,13 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Não autorizado' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const { messages } = await req.json();
+    const { messages, recipe_context } = await req.json();
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: 'Envie ao menos uma mensagem' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    if (!recipe_context || !recipe_context.name) {
+      return new Response(JSON.stringify({ error: 'Contexto da receita é obrigatório' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
@@ -33,28 +36,33 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'GROQ_API_KEY não configurada' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const systemPrompt = `Você é o Gastronom.IA, um chef virtual especialista em gastronomia brasileira e internacional. Você é simpático, divertido e apaixonado por cozinha.
+    const systemPrompt = `Você é o Gastronom.IA, um chef virtual especialista em gastronomia. Você está ajudando o usuário com uma receita específica.
+
+RECEITA ATUAL:
+- Nome: ${recipe_context.name}
+- Ingredientes: ${recipe_context.ingredients || 'não informados'}
+- Modo de Preparo: ${recipe_context.preparation || 'não informado'}
+- Calorias: ${recipe_context.calories || 'não informado'} kcal
 
 REGRAS ABSOLUTAS:
-1. Você SOMENTE responde perguntas relacionadas a:
-   - Receitas e culinária
-   - Ingredientes e substituições
-   - Técnicas culinárias
-   - Dicas de cozinha
-   - Nutrição e informações nutricionais de alimentos
-   - Equipamentos e utensílios de cozinha
-   - Harmonização de sabores
-   - Gastronomia em geral
+1. Você SOMENTE pode responder perguntas relacionadas a:
+   - Esta receita específica (${recipe_context.name})
+   - Substituições de ingredientes DESTA receita
+   - Técnicas culinárias usadas NESTA receita
+   - Dicas para melhorar ESTA receita
+   - Informações nutricionais DESTA receita
+   - Variações e adaptações DESTA receita
+   - Perguntas gerais sobre gastronomia e culinária
 
-2. Se o usuário perguntar sobre QUALQUER outro assunto que NÃO seja relacionado à gastronomia ou culinária, você DEVE responder educadamente:
-   "🍳 Opa! Sou o Gastronom.IA e só entendo de cozinha! Posso te ajudar com receitas, dicas culinárias, substituições de ingredientes e tudo sobre gastronomia. Me pergunta algo sobre comida que eu te ajudo! 😄"
+2. Se o usuário perguntar sobre QUALQUER assunto que NÃO seja relacionado a esta receita ou gastronomia (por exemplo: fazer papel, programação, matemática, história não-culinária, etc.), você DEVE responder EXATAMENTE:
+   "🍳 Opa! Sou o Gastronom.IA e só posso te ajudar com assuntos relacionados à receita de ${recipe_context.name} e gastronomia em geral! Me pergunta algo sobre o prato ou culinária que eu te ajudo! 😄"
 
-3. Sempre responda em português brasileiro.
-4. Use emojis de comida ocasionalmente para deixar a conversa mais divertida.
-5. Seja conciso mas informativo nas respostas.
-6. Quando sugerir receitas, inclua ingredientes e passos básicos.`;
+3. NÃO tente interpretar palavras ambíguas como receitas ou alimentos. Se alguém pedir "papel", "caneta", "carro", ou qualquer coisa claramente não-culinária, recuse educadamente.
 
-    // Limit to last 10 messages for context window
+4. Sempre responda em português brasileiro.
+5. Use emojis de comida ocasionalmente.
+6. Seja conciso mas informativo.`;
+
     const recentMessages = messages.slice(-10);
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

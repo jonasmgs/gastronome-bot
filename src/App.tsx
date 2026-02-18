@@ -12,7 +12,7 @@ import Auth from "./pages/Auth";
 import MyRecipes from "./pages/MyRecipes";
 import RecipeResult from "./pages/RecipeResult";
 import EditRecipe from "./pages/EditRecipe";
-import ChefChat from "./pages/ChefChat";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,7 +41,7 @@ const AppRoutes = () => {
       <Route path="/recipes" element={<ProtectedRoute><MyRecipes /></ProtectedRoute>} />
       <Route path="/recipe/:id" element={<ProtectedRoute><RecipeResult /></ProtectedRoute>} />
       <Route path="/edit-recipe" element={<ProtectedRoute><EditRecipe /></ProtectedRoute>} />
-      <Route path="/chat" element={<ProtectedRoute><ChefChat /></ProtectedRoute>} />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
