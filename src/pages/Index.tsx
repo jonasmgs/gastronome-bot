@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Sparkles, Loader2, UtensilsCrossed, Salad, Cake, Beef, Sandwich, Zap, ChefHat, Crown } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import BottomNav from '@/components/BottomNav';
 import IngredientCard from '@/components/IngredientCard';
+import LanguageSelector from '@/components/LanguageSelector';
 import bgIngredients from '@/assets/bg-ingredients.jpg';
 import bgIngredients2 from '@/assets/bg-ingredients-2.jpg';
 import bgIngredients3 from '@/assets/bg-ingredients-3.jpg';
@@ -17,6 +19,7 @@ import bgUtensils from '@/assets/bg-utensils.jpg';
 const bgImages = [bgIngredients, bgIngredients2, bgIngredients3, bgIngredients4, bgUtensils];
 
 const Index = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { name } = useProfile();
   const navigate = useNavigate();
@@ -27,7 +30,6 @@ const Index = () => {
   const [complexity, setComplexity] = useState<string | null>(null);
   const [currentBg, setCurrentBg] = useState(0);
 
-  // Auto-rotate background every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBg((prev) => (prev + 1) % bgImages.length);
@@ -39,7 +41,7 @@ const Index = () => {
     const trimmed = ingredient.trim();
     if (!trimmed) return;
     if (ingredients.includes(trimmed)) {
-      toast.error('Ingrediente já adicionado');
+      toast.error(t('home.alreadyAdded'));
       return;
     }
     setIngredients((prev) => [...prev, trimmed]);
@@ -55,7 +57,7 @@ const Index = () => {
 
   const generateRecipe = async () => {
     if (ingredients.length < 2) {
-      toast.error('Adicione pelo menos 2 ingredientes');
+      toast.error(t('home.minIngredients'));
       return;
     }
     setGenerating(true);
@@ -90,11 +92,24 @@ const Index = () => {
       if (saveErr) throw saveErr;
       navigate(`/recipe/${saved.id}`);
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao gerar receita');
+      toast.error(err.message || t('home.errorGenerating'));
     } finally {
       setGenerating(false);
     }
   };
+
+  const categories = [
+    { id: 'salada', label: t('home.salad'), icon: Salad },
+    { id: 'sobremesa', label: t('home.dessert'), icon: Cake },
+    { id: 'salgado', label: t('home.savory'), icon: Beef },
+    { id: 'lanche', label: t('home.snack'), icon: Sandwich },
+  ];
+
+  const complexities = [
+    { id: 'simples', label: t('home.simple'), icon: Zap },
+    { id: 'media', label: t('home.medium'), icon: ChefHat },
+    { id: 'elaborada', label: t('home.elaborate'), icon: Crown },
+  ];
 
   return (
     <div className="min-h-screen bg-background pb-24 relative overflow-hidden">
@@ -117,28 +132,28 @@ const Index = () => {
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="px-5 pt-14 pb-4">
-          <p className="text-sm text-muted-foreground">Olá,</p>
-          <h1 className="text-2xl font-bold text-foreground">{name || 'Chef'} 👋</h1>
+        <div className="px-5 pt-14 pb-4 flex items-start justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{t('home.hello')}</p>
+            <h1 className="text-2xl font-bold text-foreground">{name || t('home.chef')} 👋</h1>
+          </div>
+          <div className="pt-1">
+            <LanguageSelector />
+          </div>
         </div>
 
-        {/* Badge Modo Teste */}
+        {/* Badge */}
         <div className="px-5 mb-4">
           <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-            <Sparkles className="h-3 w-3" /> Modo Teste
+            <Sparkles className="h-3 w-3" /> {t('common.testMode')}
           </span>
         </div>
 
         {/* Category Selector */}
         <div className="px-5 mb-4">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Tipo de prato</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.dishType')}</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {[
-              { id: 'salada', label: 'Salada', icon: Salad },
-              { id: 'sobremesa', label: 'Sobremesa', icon: Cake },
-              { id: 'salgado', label: 'Salgado', icon: Beef },
-              { id: 'lanche', label: 'Lanche', icon: Sandwich },
-            ].map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setCategory(category === cat.id ? null : cat.id)}
@@ -157,13 +172,9 @@ const Index = () => {
 
         {/* Complexity Selector */}
         <div className="px-5 mb-4">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Complexidade</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.complexity')}</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {[
-              { id: 'simples', label: 'Simples', icon: Zap },
-              { id: 'media', label: 'Média', icon: ChefHat },
-              { id: 'elaborada', label: 'Elaborada', icon: Crown },
-            ].map((opt) => (
+            {complexities.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => setComplexity(complexity === opt.id ? null : opt.id)}
@@ -179,6 +190,7 @@ const Index = () => {
             ))}
           </div>
         </div>
+
         <div className="px-5 mb-4">
           <div className="flex gap-2">
             <input
@@ -186,7 +198,7 @@ const Index = () => {
               value={ingredient}
               onChange={(e) => setIngredient(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Digite um ingrediente..."
+              placeholder={t('home.ingredientPlaceholder')}
               className="flex-1 rounded-xl border border-input bg-card/90 backdrop-blur-sm py-3 px-4 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <button
@@ -202,17 +214,9 @@ const Index = () => {
         <div className="px-5 mb-6">
           <AnimatePresence>
             {ingredients.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-wrap gap-2"
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-2">
                 {ingredients.map((ing) => (
-                  <IngredientCard
-                    key={ing}
-                    name={ing}
-                    onRemove={() => setIngredients((prev) => prev.filter((i) => i !== ing))}
-                  />
+                  <IngredientCard key={ing} name={ing} onRemove={() => setIngredients((prev) => prev.filter((i) => i !== ing))} />
                 ))}
               </motion.div>
             )}
@@ -221,7 +225,7 @@ const Index = () => {
           {ingredients.length === 0 && (
             <div className="mt-12 flex flex-col items-center text-center text-muted-foreground">
               <UtensilsCrossed className="mb-3 h-12 w-12 opacity-30" />
-              <p className="text-sm">Adicione ingredientes para começar</p>
+              <p className="text-sm">{t('home.addIngredients')}</p>
               <p className="text-xs mt-1 opacity-70">🍳 🥘 🔪 🥄</p>
             </div>
           )}
@@ -229,22 +233,14 @@ const Index = () => {
 
         {/* Generate Button */}
         {ingredients.length >= 2 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-5"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="px-5">
             <button
               onClick={generateRecipe}
               disabled={generating}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
             >
-              {generating ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : (
-                <Sparkles className="h-5 w-5" />
-              )}
-              {generating ? 'Gerando receita...' : 'Gerar Receita'}
+              {generating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+              {generating ? t('home.generating') : t('home.generate')}
             </button>
           </motion.div>
         )}
