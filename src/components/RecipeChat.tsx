@@ -3,8 +3,16 @@ import { Send, Loader2, ChefHat, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
+
+interface Ingredient {
+  name: string;
+  quantity: string;
+  calories: number;
+  tip?: string;
+}
 
 interface RecipeContext {
   name: string;
@@ -15,8 +23,11 @@ interface RecipeContext {
 
 interface RecipeChatProps {
   recipe: RecipeContext;
+  recipeId: string;
+  rawIngredients: Ingredient[];
   open: boolean;
   onClose: () => void;
+  onRecipeUpdated: () => void;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chef-chat`;
@@ -100,7 +111,7 @@ async function streamChat({
   onDone();
 }
 
-const RecipeChat = ({ recipe, open, onClose }: RecipeChatProps) => {
+const RecipeChat = ({ recipe, recipeId, rawIngredients, open, onClose, onRecipeUpdated }: RecipeChatProps) => {
   const { session } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
@@ -143,7 +154,32 @@ const RecipeChat = ({ recipe, open, onClose }: RecipeChatProps) => {
         token: session.access_token,
         recipe_context: recipe,
         onDelta: (chunk) => upsertAssistant(chunk),
-        onDone: () => setIsLoading(false),
+        onDone: async () => {
+          setIsLoading(false);
+          // Check for substitution marker in the final response
+          const match = assistantSoFar.match(/<<<SUBSTITUIR:\s*(.+?)\s*>>>\s*(.+?)>>>/);
+          if (match) {
+            const oldName = match[1].trim().toLowerCase();
+            const newName = match[2].trim();
+            const updatedIngredients = rawIngredients.map(ing => {
+              if (ing.name.toLowerCase().includes(oldName) || oldName.includes(ing.name.toLowerCase())) {
+                return { ...ing, name: newName };
+              }
+              return ing;
+            });
+            const changed = JSON.stringify(updatedIngredients) !== JSON.stringify(rawIngredients);
+            if (changed) {
+              const { error } = await supabase
+                .from('recipes')
+                .update({ ingredients: updatedIngredients as any })
+                .eq('id', recipeId);
+              if (!error) {
+                toast.success(`Ingrediente substituído: ${newName} ✨`);
+                onRecipeUpdated();
+              }
+            }
+          }
+        },
       });
     } catch (e: any) {
       console.error(e);
@@ -232,7 +268,7 @@ const RecipeChat = ({ recipe, open, onClose }: RecipeChatProps) => {
                       : 'bg-card border border-border text-card-foreground rounded-bl-md'
                   }`}
                 >
-                  {msg.content}
+                  {msg.content.replace(/<<<SUBSTITUIR:.*?>>>/g, '').trim()}
                   {msg.role === 'assistant' && isLoading && i === messages.length - 1 && (
                     <span className="inline-block w-1.5 h-4 bg-primary/60 rounded-full ml-0.5 animate-pulse" />
                   )}

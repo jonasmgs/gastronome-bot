@@ -53,7 +53,7 @@ const RecipeResult = () => {
   const [filters, setFilters] = useState<DietaryFilters>({ vegan: false, glutenFree: false, lactoseFree: false });
   const [chatOpen, setChatOpen] = useState(false);
 
-  useEffect(() => {
+  const fetchRecipe = () => {
     if (!id) return;
     supabase
       .from('recipes')
@@ -69,6 +69,10 @@ const RecipeResult = () => {
         }
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchRecipe();
   }, [id, navigate]);
 
   const handleShare = async () => {
@@ -356,8 +360,11 @@ const RecipeResult = () => {
               preparation: recipe.preparation,
               calories: recipe.calories_total,
             }}
+            recipeId={recipe.id}
+            rawIngredients={ingredients}
             open={chatOpen}
             onClose={() => setChatOpen(false)}
+            onRecipeUpdated={fetchRecipe}
           />
         )}
       </AnimatePresence>
