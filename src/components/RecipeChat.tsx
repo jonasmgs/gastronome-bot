@@ -160,7 +160,7 @@ const RecipeChat = ({ recipe, open, onClose }: RecipeChatProps) => {
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      className="fixed inset-0 z-50 flex flex-col bg-background"
+      className="fixed inset-0 z-[60] flex flex-col bg-background"
     >
       {/* Header */}
       <div className="border-b border-border bg-card/80 px-4 py-3">
