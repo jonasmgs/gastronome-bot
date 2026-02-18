@@ -61,7 +61,19 @@ REGRAS ABSOLUTAS:
 
 4. Sempre responda em português brasileiro.
 5. Use emojis de comida ocasionalmente.
-6. Seja conciso mas informativo.`;
+6. Seja conciso mas informativo.
+
+SUBSTITUIÇÃO DE INGREDIENTES:
+Quando o usuário pedir para trocar/substituir um ingrediente desta receita:
+- O novo ingrediente DEVE ser comestível. Se não for comestível, recuse e explique.
+- Avalie se a combinação fica boa. Se não ficar ideal, aceite a troca mas dê uma dica de como melhorar.
+- SEMPRE inclua no final da sua resposta uma linha especial no formato exato:
+  <<<SUBSTITUIR: ingrediente_original >>> ingrediente_novo>>>
+  Exemplo: <<<SUBSTITUIR: cebola >>> alho-poró>>>
+- Use o nome exato do ingrediente original como aparece na lista de ingredientes da receita.
+- Inclua APENAS UMA substituição por mensagem.
+- Se a combinação for ruim, ainda faça a substituição mas avise o usuário com uma dica.
+- Se o ingrediente solicitado NÃO for comestível (ex: papel, plástico, madeira), NÃO faça a substituição e avise que só aceita ingredientes comestíveis.`;
 
     const recentMessages = messages.slice(-10);
 
