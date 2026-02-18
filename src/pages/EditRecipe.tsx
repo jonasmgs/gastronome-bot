@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Leaf, WheatOff, MilkOff, Loader2, Wand2, ClipboardPaste } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import BottomNav from '@/components/BottomNav';
@@ -15,6 +16,7 @@ interface DietaryFilters {
 }
 
 const EditRecipe = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [recipeText, setRecipeText] = useState('');
@@ -62,10 +64,10 @@ const EditRecipe = () => {
       }).select().single();
 
       if (saveErr) throw saveErr;
-      toast.success('Receita transformada!');
+      toast.success(t('edit.transformed'));
       navigate(`/recipe/${saved.id}`);
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao transformar receita');
+      toast.error(err.message || t('edit.transformError'));
     } finally {
       setTransforming(false);
     }
@@ -75,15 +77,14 @@ const EditRecipe = () => {
     try {
       const text = await navigator.clipboard.readText();
       setRecipeText(text);
-      toast.success('Receita colada!');
+      toast.success(t('edit.pasted'));
     } catch {
-      toast.error('Não foi possível acessar a área de transferência');
+      toast.error(t('edit.pasteError'));
     }
   };
 
   return (
     <div className="min-h-screen bg-background pb-24 relative overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 z-0 h-64">
         <img src={bgIngredients3} alt="" className="h-64 w-full object-cover opacity-20" />
         <div className="absolute inset-0 h-64 bg-gradient-to-b from-transparent to-background" />
@@ -91,57 +92,45 @@ const EditRecipe = () => {
 
       <div className="relative z-10">
         <div className="px-5 pt-14 pb-4">
-          <h1 className="text-2xl font-bold text-foreground">Editar Receita ✨</h1>
-          <p className="text-sm text-muted-foreground mt-1">Cole uma receita e aplique filtros dietéticos</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('edit.title')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('edit.subtitle')}</p>
         </div>
 
         <div className="px-5 space-y-4">
-          {/* Recipe text input */}
           <div className="rounded-2xl border border-border bg-card p-4">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-card-foreground">📋 Sua Receita</h2>
+              <h2 className="text-sm font-semibold text-card-foreground">{t('edit.yourRecipe')}</h2>
               <button onClick={handlePaste} className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent">
-                <ClipboardPaste className="h-3 w-3" /> Colar
+                <ClipboardPaste className="h-3 w-3" /> {t('edit.paste')}
               </button>
             </div>
             <textarea
               value={recipeText}
               onChange={(e) => setRecipeText(e.target.value)}
-              placeholder="Cole ou digite a receita aqui...&#10;&#10;Ex: Bolo de chocolate&#10;Ingredientes: 2 ovos, 1 xícara de farinha de trigo, 1/2 xícara de chocolate em pó...&#10;Modo de preparo: Misture os ingredientes secos..."
+              placeholder={t('edit.placeholder')}
               rows={8}
               className="w-full rounded-xl border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
             />
           </div>
 
-          {/* Dietary Filters */}
           <div className="rounded-2xl border border-border bg-card p-4">
             <h2 className="mb-3 text-sm font-semibold text-card-foreground flex items-center gap-1.5">
-              <Wand2 className="h-4 w-4" /> Filtros Dietéticos
+              <Wand2 className="h-4 w-4" /> {t('edit.dietaryFilters')}
             </h2>
-            <p className="text-xs text-muted-foreground mb-3">Escolha os filtros para transformar a receita</p>
+            <p className="text-xs text-muted-foreground mb-3">{t('edit.filterDescription')}</p>
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => toggleFilter('vegan')}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${filters.vegan ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}
-              >
-                <Leaf className="h-4 w-4" /> Vegana
+              <button onClick={() => toggleFilter('vegan')} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${filters.vegan ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                <Leaf className="h-4 w-4" /> {t('recipe.vegan')}
               </button>
-              <button
-                onClick={() => toggleFilter('glutenFree')}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${filters.glutenFree ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}
-              >
-                <WheatOff className="h-4 w-4" /> Sem Glúten
+              <button onClick={() => toggleFilter('glutenFree')} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${filters.glutenFree ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                <WheatOff className="h-4 w-4" /> {t('recipe.glutenFree')}
               </button>
-              <button
-                onClick={() => toggleFilter('lactoseFree')}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${filters.lactoseFree ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}
-              >
-                <MilkOff className="h-4 w-4" /> Sem Lactose
+              <button onClick={() => toggleFilter('lactoseFree')} className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${filters.lactoseFree ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                <MilkOff className="h-4 w-4" /> {t('recipe.lactoseFree')}
               </button>
             </div>
           </div>
 
-          {/* Transform Button */}
           <motion.button
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: canSubmit ? 1 : 0.5, y: 0 }}
@@ -150,7 +139,7 @@ const EditRecipe = () => {
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {transforming ? <Loader2 className="h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5" />}
-            {transforming ? 'Transformando...' : 'Transformar Receita'}
+            {transforming ? t('edit.transforming') : t('edit.transform')}
           </motion.button>
         </div>
       </div>

@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChefHat, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from '@/components/LanguageSelector';
 import bgIngredients from '@/assets/bg-ingredients.jpg';
 import bgIngredients2 from '@/assets/bg-ingredients-2.jpg';
 import bgIngredients3 from '@/assets/bg-ingredients-3.jpg';
@@ -14,6 +16,7 @@ const bgImages = [bgIngredients, bgIngredients2, bgIngredients3, bgIngredients4,
 type Mode = 'login' | 'signup' | 'forgot';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,25 +49,30 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast.success('Verifique seu email para confirmar o cadastro!');
+        toast.success(t('auth.checkEmail'));
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin,
         });
         if (error) throw error;
-        toast.success('Email de recuperação enviado!');
+        toast.success(t('auth.recoveryEmail'));
       }
     } catch (err: any) {
-      toast.error(err.message || 'Erro inesperado');
+      toast.error(err.message || t('auth.unexpectedError'));
     } finally {
       setLoading(false);
     }
   };
 
-  const title = mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar Conta' : 'Recuperar Senha';
+  const title = mode === 'login' ? t('auth.login') : mode === 'signup' ? t('auth.signup') : t('auth.forgot');
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
+      {/* Language selector */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSelector />
+      </div>
+
       {/* Rotating Background */}
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">
@@ -92,8 +100,8 @@ const Auth = () => {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg">
             <ChefHat className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">NutriChef AI</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Receitas inteligentes com IA</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t('auth.appName')}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('auth.appSlogan')}</p>
         </div>
 
         <div className="rounded-2xl border border-border bg-card/90 backdrop-blur-sm p-6 shadow-lg">
@@ -105,7 +113,7 @@ const Auth = () => {
                 <motion.div key="name" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
+                    <input type="text" placeholder={t('auth.name')} value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
                   </div>
                 </motion.div>
               )}
@@ -113,13 +121,13 @@ const Auth = () => {
 
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
+              <input type="email" placeholder={t('auth.email')} value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
             </div>
 
             {mode !== 'forgot' && (
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input type="password" placeholder="Senha" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required minLength={6} />
+                <input type="password" placeholder={t('auth.password')} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required minLength={6} />
               </div>
             )}
 
@@ -132,15 +140,15 @@ const Auth = () => {
           <div className="mt-5 space-y-2 text-center text-xs text-muted-foreground">
             {mode === 'login' && (
               <>
-                <button onClick={() => setMode('forgot')} className="block w-full hover:text-foreground transition-colors">Esqueceu a senha?</button>
-                <button onClick={() => setMode('signup')} className="block w-full hover:text-foreground transition-colors">Criar uma conta</button>
+                <button onClick={() => setMode('forgot')} className="block w-full hover:text-foreground transition-colors">{t('auth.forgotPassword')}</button>
+                <button onClick={() => setMode('signup')} className="block w-full hover:text-foreground transition-colors">{t('auth.createAccount')}</button>
               </>
             )}
             {mode === 'signup' && (
-              <button onClick={() => setMode('login')} className="block w-full hover:text-foreground transition-colors">Já tenho uma conta</button>
+              <button onClick={() => setMode('login')} className="block w-full hover:text-foreground transition-colors">{t('auth.haveAccount')}</button>
             )}
             {mode === 'forgot' && (
-              <button onClick={() => setMode('login')} className="block w-full hover:text-foreground transition-colors">Voltar ao login</button>
+              <button onClick={() => setMode('login')} className="block w-full hover:text-foreground transition-colors">{t('auth.backToLogin')}</button>
             )}
           </div>
         </div>

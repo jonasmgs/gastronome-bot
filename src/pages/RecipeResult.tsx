@@ -5,6 +5,7 @@ import { ArrowLeft, Flame, Share2, Check, Clock, ChefHat, Users, Gauge, Leaf, Wh
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import type { Tables } from '@/integrations/supabase/types';
 import BottomNav from '@/components/BottomNav';
 import RecipeChat from '@/components/RecipeChat';
@@ -44,6 +45,7 @@ interface DietaryFilters {
 }
 
 const RecipeResult = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ const RecipeResult = () => {
       .single()
       .then(({ data, error }) => {
         if (error || !data) {
-          toast.error('Receita não encontrada');
+          toast.error(t('recipes.notFound'));
           navigate('/');
         } else {
           setRecipe(data);
@@ -130,10 +132,10 @@ const RecipeResult = () => {
       }).select().single();
 
       if (saveErr) throw saveErr;
-      toast.success('Receita transformada!');
+      toast.success(t('recipe.transformed'));
       navigate(`/recipe/${saved.id}`);
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao transformar receita');
+      toast.error(err.message || t('recipe.transformError'));
     } finally {
       setTransforming(false);
     }
@@ -196,7 +198,7 @@ const RecipeResult = () => {
           <div className="flex flex-wrap gap-2">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary">
               <Flame className="h-4 w-4" />
-              {recipe.calories_total} kcal
+              {recipe.calories_total} {t('common.kcal')}
             </motion.div>
             {meta.difficulty && (
               <div className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground">
@@ -205,17 +207,17 @@ const RecipeResult = () => {
             )}
             {meta.prep_time && (
               <div className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-                <Clock className="h-3 w-3" /> Preparo: {meta.prep_time}
+                <Clock className="h-3 w-3" /> {t('common.prep')}: {meta.prep_time}
               </div>
             )}
             {meta.cook_time && (
               <div className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-                <Clock className="h-3 w-3" /> Cozimento: {meta.cook_time}
+                <Clock className="h-3 w-3" /> {t('common.cooking')}: {meta.cook_time}
               </div>
             )}
             {meta.servings && (
               <div className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-                <Users className="h-3 w-3" /> {meta.servings} porções
+                <Users className="h-3 w-3" /> {meta.servings} {t('common.portions')}
               </div>
             )}
             {meta.dietary_tags && meta.dietary_tags.length > 0 && meta.dietary_tags.map((tag, i) => (
@@ -224,7 +226,7 @@ const RecipeResult = () => {
               </div>
             ))}
             <div className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground">
-              <Check className="h-3 w-3" /> Salvo
+              <Check className="h-3 w-3" /> {t('common.saved')}
             </div>
           </div>
 
@@ -232,7 +234,7 @@ const RecipeResult = () => {
           {meta.substitutions_made && (
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
               <h2 className="mb-2 text-sm font-semibold text-primary flex items-center gap-1.5">
-                <Wand2 className="h-4 w-4" /> Substituições Realizadas
+                <Wand2 className="h-4 w-4" /> {t('recipe.substitutionsMade')}
               </h2>
               <p className="text-sm leading-relaxed text-foreground/80 whitespace-pre-line">{meta.substitutions_made}</p>
             </div>
@@ -241,27 +243,27 @@ const RecipeResult = () => {
           {/* Dietary Filter Transform */}
           <div className="rounded-2xl border border-border bg-card p-4">
             <h2 className="mb-3 text-sm font-semibold text-card-foreground flex items-center gap-1.5">
-              <Wand2 className="h-4 w-4" /> Transformar Receita
+              <Wand2 className="h-4 w-4" /> {t('recipe.transformRecipe')}
             </h2>
-            <p className="text-xs text-muted-foreground mb-3">Selecione os filtros e a IA vai criar uma nova versão desta receita</p>
+            <p className="text-xs text-muted-foreground mb-3">{t('recipe.transformDescription')}</p>
             <div className="flex flex-wrap gap-2 mb-3">
               <button
                 onClick={() => toggleFilter('vegan')}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-all ${filters.vegan ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}
               >
-                <Leaf className="h-3.5 w-3.5" /> Vegana
+                <Leaf className="h-3.5 w-3.5" /> {t('recipe.vegan')}
               </button>
               <button
                 onClick={() => toggleFilter('glutenFree')}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-all ${filters.glutenFree ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}
               >
-                <WheatOff className="h-3.5 w-3.5" /> Sem Glúten
+                <WheatOff className="h-3.5 w-3.5" /> {t('recipe.glutenFree')}
               </button>
               <button
                 onClick={() => toggleFilter('lactoseFree')}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-all ${filters.lactoseFree ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}
               >
-                <MilkOff className="h-3.5 w-3.5" /> Sem Lactose
+                <MilkOff className="h-3.5 w-3.5" /> {t('recipe.lactoseFree')}
               </button>
             </div>
             {hasActiveFilters && (
@@ -273,14 +275,14 @@ const RecipeResult = () => {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
               >
                 {transforming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                {transforming ? 'Transformando...' : 'Transformar Receita'}
+                {transforming ? t('recipe.transforming') : t('recipe.transform')}
               </motion.button>
             )}
           </div>
 
           {/* Ingredients */}
           <div className="rounded-2xl border border-border bg-card p-4">
-            <h2 className="mb-3 text-sm font-semibold text-card-foreground">🧑‍🍳 Ingredientes</h2>
+            <h2 className="mb-3 text-sm font-semibold text-card-foreground">{t('recipe.ingredients')}</h2>
             <div className="space-y-2.5">
               {ingredients.map((ing, i) => (
                 <div key={i} className="space-y-0.5">
@@ -288,7 +290,7 @@ const RecipeResult = () => {
                     <span className="text-card-foreground font-medium">
                       {ing.name} — <span className="text-muted-foreground font-normal">{ing.quantity}</span>
                     </span>
-                    <span className="text-xs text-muted-foreground">{ing.calories} kcal</span>
+                    <span className="text-xs text-muted-foreground">{ing.calories} {t('common.kcal')}</span>
                   </div>
                   {ing.tip && <p className="text-xs text-muted-foreground italic pl-2">💡 {ing.tip}</p>}
                 </div>
@@ -299,7 +301,7 @@ const RecipeResult = () => {
           {/* Step-by-step */}
           {hasDetailedFormat ? (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <h2 className="mb-4 text-sm font-semibold text-card-foreground">📝 Passo a Passo</h2>
+              <h2 className="mb-4 text-sm font-semibold text-card-foreground">{t('recipe.stepByStep')}</h2>
               <div className="space-y-4">
                 {steps.map((step, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className="relative pl-8">
@@ -311,7 +313,7 @@ const RecipeResult = () => {
                         {step.duration && <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {step.duration}</span>}
                       </div>
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{step.description}</p>
-                      {step.tip && <p className="mt-1.5 text-xs text-primary/80 italic">💡 Dica: {step.tip}</p>}
+                      {step.tip && <p className="mt-1.5 text-xs text-primary/80 italic">💡 {t('recipe.tip')}: {step.tip}</p>}
                     </div>
                   </motion.div>
                 ))}
@@ -319,7 +321,7 @@ const RecipeResult = () => {
             </div>
           ) : (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <h2 className="mb-3 text-sm font-semibold text-card-foreground">📝 Modo de Preparo</h2>
+              <h2 className="mb-3 text-sm font-semibold text-card-foreground">{t('recipe.preparation')}</h2>
               <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{recipe.preparation}</p>
             </div>
           )}
@@ -327,7 +329,7 @@ const RecipeResult = () => {
           {/* Chef Tips */}
           {meta.chef_tips && (
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <h2 className="mb-2 text-sm font-semibold text-primary flex items-center gap-1.5"><ChefHat className="h-4 w-4" /> Dicas do Chef</h2>
+              <h2 className="mb-2 text-sm font-semibold text-primary flex items-center gap-1.5"><ChefHat className="h-4 w-4" /> {t('recipe.chefTips')}</h2>
               <p className="text-sm leading-relaxed text-foreground/80 whitespace-pre-line">{meta.chef_tips}</p>
             </div>
           )}
@@ -335,7 +337,7 @@ const RecipeResult = () => {
           {/* Nutrition */}
           {(meta.nutrition_info || (!hasDetailedFormat && recipe.nutrition_info)) && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <h2 className="mb-3 text-sm font-semibold text-card-foreground">📊 Informações Nutricionais</h2>
+              <h2 className="mb-3 text-sm font-semibold text-card-foreground">{t('recipe.nutritionInfo')}</h2>
               <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">{meta.nutrition_info || recipe.nutrition_info}</p>
             </div>
           )}
@@ -346,7 +348,7 @@ const RecipeResult = () => {
       <button
         onClick={() => setChatOpen(true)}
         className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all active:scale-95 hover:shadow-xl"
-        aria-label="Perguntar ao chef sobre esta receita"
+        aria-label={t('recipe.askChef')}
       >
         <MessageCircle className="h-6 w-6" />
       </button>

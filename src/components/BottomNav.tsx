@@ -1,16 +1,18 @@
 import { Home, BookOpen, LogOut, Wand2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 const BottomNav = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useAuth();
 
   const items = [
-    { icon: Home, label: 'Home', path: '/' },
-    { icon: Wand2, label: 'Editar', path: '/edit-recipe' },
-    { icon: BookOpen, label: 'Receitas', path: '/recipes' },
+    { icon: Home, label: t('nav.home'), path: '/' },
+    { icon: Wand2, label: t('nav.edit'), path: '/edit-recipe' },
+    { icon: BookOpen, label: t('nav.recipes'), path: '/recipes' },
   ];
 
   return (
@@ -36,7 +38,7 @@ const BottomNav = () => {
           className="flex flex-col items-center gap-0.5 px-4 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
         >
           <LogOut className="h-5 w-5" />
-          Sair
+          {t('nav.logout')}
         </button>
       </div>
     </nav>

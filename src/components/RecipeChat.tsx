@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, ChefHat, Trash2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -112,6 +113,7 @@ async function streamChat({
 }
 
 const RecipeChat = ({ recipe, recipeId, rawIngredients, open, onClose, onRecipeUpdated }: RecipeChatProps) => {
+  const { t } = useTranslation();
   const { session } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
@@ -174,7 +176,7 @@ const RecipeChat = ({ recipe, recipeId, rawIngredients, open, onClose, onRecipeU
                 .update({ ingredients: updatedIngredients as any })
                 .eq('id', recipeId);
               if (!error) {
-                toast.success(`Ingrediente substituído: ${newName} ✨`);
+                toast.success(t('chat.substituted', { name: newName }));
                 onRecipeUpdated();
               }
             }
@@ -183,7 +185,7 @@ const RecipeChat = ({ recipe, recipeId, rawIngredients, open, onClose, onRecipeU
       });
     } catch (e: any) {
       console.error(e);
-      toast.error(e.message || 'Erro ao conversar com o chef');
+      toast.error(e.message || t('chat.chatError'));
       setIsLoading(false);
     }
   };
@@ -231,15 +233,13 @@ const RecipeChat = ({ recipe, recipeId, rawIngredients, open, onClose, onRecipeU
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
                 <ChefHat className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-foreground">Pergunte sobre a receita 👨‍🍳</h2>
-              <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-                Tire dúvidas sobre <strong>{recipe.name}</strong>, peça substituições de ingredientes ou dicas culinárias!
-              </p>
+              <h2 className="text-lg font-semibold text-foreground">{t('chat.askAboutRecipe')}</h2>
+              <p className="mt-2 text-sm text-muted-foreground max-w-xs" dangerouslySetInnerHTML={{ __html: t('chat.askDescription', { name: recipe.name }) }} />
               <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {[
-                  'Posso substituir algum ingrediente?',
-                  'Dicas para ficar melhor?',
-                  'Qual o tempo ideal de cozimento?',
+                  t('chat.suggestion1'),
+                  t('chat.suggestion2'),
+                  t('chat.suggestion3'),
                 ].map((q) => (
                   <button
                     key={q}
@@ -301,7 +301,7 @@ const RecipeChat = ({ recipe, recipeId, rawIngredients, open, onClose, onRecipeU
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Pergunte sobre a receita..."
+            placeholder={t('chat.placeholder')}
             disabled={isLoading}
             className="flex-1 rounded-full border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
           />
