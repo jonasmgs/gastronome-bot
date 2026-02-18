@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Flame, Share2, Check, Clock, ChefHat, Users, Gauge, Leaf, WheatOff, MilkOff, Loader2, Wand2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Flame, Share2, Check, Clock, ChefHat, Users, Gauge, Leaf, WheatOff, MilkOff, Loader2, Wand2, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
 import BottomNav from '@/components/BottomNav';
+import RecipeChat from '@/components/RecipeChat';
 import bgUtensils from '@/assets/bg-utensils.jpg';
 
 interface Ingredient {
@@ -50,6 +51,7 @@ const RecipeResult = () => {
   const [loading, setLoading] = useState(true);
   const [transforming, setTransforming] = useState(false);
   const [filters, setFilters] = useState<DietaryFilters>({ vegan: false, glutenFree: false, lactoseFree: false });
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -335,6 +337,30 @@ const RecipeResult = () => {
           )}
         </div>
       </div>
+
+      {/* Chat FAB */}
+      <button
+        onClick={() => setChatOpen(true)}
+        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all active:scale-95 hover:shadow-xl"
+        aria-label="Perguntar ao chef sobre esta receita"
+      >
+        <MessageCircle className="h-6 w-6" />
+      </button>
+
+      <AnimatePresence>
+        {chatOpen && (
+          <RecipeChat
+            recipe={{
+              name: recipe.recipe_name,
+              ingredients: ingredients.map(i => `${i.name} (${i.quantity})`).join(', '),
+              preparation: recipe.preparation,
+              calories: recipe.calories_total,
+            }}
+            open={chatOpen}
+            onClose={() => setChatOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <BottomNav />
     </div>
