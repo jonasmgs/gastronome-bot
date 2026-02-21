@@ -100,6 +100,8 @@ export default {
     transform: 'Transform Recipe',
     transformed: 'Recipe transformed!',
     transformError: 'Error transforming recipe',
+    validationMin: 'Recipe must be more than 10 characters',
+    validationFilter: 'Select at least one dietary filter',
   },
   chat: {
     title: 'Gastronom.IA',

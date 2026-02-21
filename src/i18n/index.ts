@@ -41,4 +41,12 @@ i18n
     },
   });
 
+// Update <html> lang attribute on language change
+const updateHtmlLang = (lng: string) => {
+  const langMap: Record<string, string> = { pt: 'pt-BR', en: 'en', es: 'es', de: 'de', it: 'it', fr: 'fr' };
+  document.documentElement.lang = langMap[lng] || lng;
+};
+updateHtmlLang(i18n.language || 'pt');
+i18n.on('languageChanged', updateHtmlLang);
+
 export default i18n;
