@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { supportedLanguages } from '@/i18n';
 import { getTheme, setTheme, getFontSize, setFontSize, getFontFamily, setFontFamily, type ThemeMode, type FontSize, type FontFamily } from '@/lib/theme';
 import { useState } from 'react';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import BottomNav from '@/components/BottomNav';
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
+  usePageTitle(t('settings.title'));
   const navigate = useNavigate();
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>(getTheme());
   const [currentSize, setCurrentSize] = useState<FontSize>(getFontSize());
@@ -58,29 +60,30 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-40 border-b border-border bg-card/80 ios-blur">
+    <main className="min-h-screen bg-background pb-24" role="main">
+      <header className="sticky top-0 z-40 border-b border-border bg-card/80 ios-blur">
         <div className="mx-auto flex max-w-md items-center gap-3 px-4 py-3">
-          <button onClick={() => navigate(-1)} className="rounded-full p-1.5 text-muted-foreground hover:bg-accent">
+          <button onClick={() => navigate(-1)} className="rounded-full p-1.5 text-muted-foreground hover:bg-accent" aria-label={t('common.cancel')}>
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="text-lg font-semibold text-foreground">{t('settings.title')}</h1>
         </div>
-      </div>
+      </header>
 
       <div className="mx-auto max-w-md space-y-6 px-4 py-6">
         {/* Language */}
-        <section>
+        <section aria-label={t('settings.language')}>
           <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Globe className="h-4 w-4" />
             {t('settings.language')}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('settings.language')}>
             {supportedLanguages.map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => i18n.changeLanguage(lang.code)}
+                role="radio"
+                aria-checked={i18n.language?.startsWith(lang.code)}
                 className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors ${
                   i18n.language?.startsWith(lang.code)
                     ? 'border-primary bg-primary/10 text-primary font-medium'
@@ -95,16 +98,18 @@ const Settings = () => {
         </section>
 
         {/* Theme */}
-        <section>
+        <section aria-label={t('settings.theme')}>
           <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Sun className="h-4 w-4" />
             {t('settings.theme')}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2" role="radiogroup" aria-label={t('settings.theme')}>
             {themeOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleTheme(opt.value)}
+                role="radio"
+                aria-checked={currentTheme === opt.value}
                 className={`flex flex-1 flex-col items-center gap-1.5 rounded-xl border px-3 py-3 text-xs transition-colors ${
                   currentTheme === opt.value
                     ? 'border-primary bg-primary/10 text-primary font-medium'
@@ -119,16 +124,18 @@ const Settings = () => {
         </section>
 
         {/* Font Size */}
-        <section>
+        <section aria-label={t('settings.fontSize')}>
           <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <ALargeSmall className="h-4 w-4" />
             {t('settings.fontSize')}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2" role="radiogroup" aria-label={t('settings.fontSize')}>
             {sizeOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleSize(opt.value)}
+                role="radio"
+                aria-checked={currentSize === opt.value}
                 className={`flex flex-1 items-center justify-center rounded-xl border px-3 py-3 transition-colors ${
                   currentSize === opt.value
                     ? 'border-primary bg-primary/10 text-primary font-medium'
@@ -143,16 +150,18 @@ const Settings = () => {
         </section>
 
         {/* Font Family */}
-        <section>
+        <section aria-label={t('settings.fontFamily')}>
           <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <Type className="h-4 w-4" />
             {t('settings.fontFamily')}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('settings.fontFamily')}>
             {fontOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => handleFont(opt.value)}
+                role="radio"
+                aria-checked={currentFont === opt.value}
                 className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-sm transition-colors ${
                   currentFont === opt.value
                     ? 'border-primary bg-primary/10 text-primary font-medium'
@@ -168,7 +177,7 @@ const Settings = () => {
       </div>
 
       <BottomNav />
-    </div>
+    </main>
   );
 };
 

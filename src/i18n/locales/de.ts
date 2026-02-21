@@ -100,6 +100,8 @@ export default {
     transform: 'Rezept umwandeln',
     transformed: 'Rezept umgewandelt!',
     transformError: 'Fehler beim Umwandeln des Rezepts',
+    validationMin: 'Das Rezept muss mehr als 10 Zeichen enthalten',
+    validationFilter: 'Wähle mindestens einen Ernährungsfilter',
   },
   chat: {
     title: 'Gastronom.IA',

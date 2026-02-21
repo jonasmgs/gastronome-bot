@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import BottomNav from '@/components/BottomNav';
 import IngredientCard from '@/components/IngredientCard';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -20,6 +21,7 @@ const bgImages = [bgIngredients, bgIngredients2, bgIngredients3, bgIngredients4,
 
 const Index = () => {
   const { t } = useTranslation();
+  usePageTitle();
   const { user } = useAuth();
   const { name } = useProfile();
   const navigate = useNavigate();
@@ -112,9 +114,9 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24 relative overflow-hidden">
+    <main className="min-h-screen bg-background pb-24 relative overflow-hidden" role="main">
       {/* Rotating Background Images */}
-      <div className="absolute inset-0 z-0 h-80">
+      <div className="absolute inset-0 z-0 h-80" aria-hidden="true">
         <AnimatePresence mode="wait">
           <motion.img
             key={currentBg}
@@ -131,8 +133,7 @@ const Index = () => {
       </div>
 
       <div className="relative z-10">
-        {/* Header */}
-        <div className="px-5 pt-14 pb-4 flex items-start justify-between">
+        <header className="px-5 pt-14 pb-4 flex items-start justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{t('home.hello')}</p>
             <h1 className="text-2xl font-bold text-foreground">{name || t('home.chef')} 👋</h1>
@@ -140,7 +141,7 @@ const Index = () => {
           <div className="pt-1">
             <LanguageSelector />
           </div>
-        </div>
+        </header>
 
         {/* Badge */}
         <div className="px-5 mb-4">
@@ -150,13 +151,14 @@ const Index = () => {
         </div>
 
         {/* Category Selector */}
-        <div className="px-5 mb-4">
+        <section className="px-5 mb-4" aria-label={t('home.dishType')}>
           <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.dishType')}</p>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1" role="group">
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setCategory(category === cat.id ? null : cat.id)}
+                aria-pressed={category === cat.id}
                 className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
                   category === cat.id
                     ? 'bg-primary text-primary-foreground shadow-md'
@@ -168,16 +170,17 @@ const Index = () => {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Complexity Selector */}
-        <div className="px-5 mb-4">
+        <section className="px-5 mb-4" aria-label={t('home.complexity')}>
           <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.complexity')}</p>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1" role="group">
             {complexities.map((opt) => (
               <button
                 key={opt.id}
                 onClick={() => setComplexity(complexity === opt.id ? null : opt.id)}
+                aria-pressed={complexity === opt.id}
                 className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
                   complexity === opt.id
                     ? 'bg-primary text-primary-foreground shadow-md'
@@ -189,11 +192,13 @@ const Index = () => {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         <div className="px-5 mb-4">
           <div className="flex gap-2">
+            <label className="sr-only" htmlFor="ingredient-input">{t('home.ingredientPlaceholder')}</label>
             <input
+              id="ingredient-input"
               type="text"
               value={ingredient}
               onChange={(e) => setIngredient(e.target.value)}
@@ -203,6 +208,7 @@ const Index = () => {
             />
             <button
               onClick={addIngredient}
+              aria-label={t('home.ingredientPlaceholder')}
               className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-all active:scale-95"
             >
               <Plus className="h-5 w-5" />
@@ -211,10 +217,10 @@ const Index = () => {
         </div>
 
         {/* Ingredients List */}
-        <div className="px-5 mb-6">
+        <section className="px-5 mb-6" aria-label={t('recipe.ingredients')}>
           <AnimatePresence>
             {ingredients.length > 0 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-2">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-2" role="list">
                 {ingredients.map((ing) => (
                   <IngredientCard key={ing} name={ing} onRemove={() => setIngredients((prev) => prev.filter((i) => i !== ing))} />
                 ))}
@@ -224,12 +230,12 @@ const Index = () => {
 
           {ingredients.length === 0 && (
             <div className="mt-12 flex flex-col items-center text-center text-muted-foreground">
-              <UtensilsCrossed className="mb-3 h-12 w-12 opacity-30" />
+              <UtensilsCrossed className="mb-3 h-12 w-12 opacity-30" aria-hidden="true" />
               <p className="text-sm">{t('home.addIngredients')}</p>
-              <p className="text-xs mt-1 opacity-70">🍳 🥘 🔪 🥄</p>
+              <p className="text-xs mt-1 opacity-70" aria-hidden="true">🍳 🥘 🔪 🥄</p>
             </div>
           )}
-        </div>
+        </section>
 
         {/* Generate Button */}
         {ingredients.length >= 2 && (
@@ -237,6 +243,7 @@ const Index = () => {
             <button
               onClick={generateRecipe}
               disabled={generating}
+              aria-busy={generating}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
             >
               {generating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
@@ -247,7 +254,7 @@ const Index = () => {
       </div>
 
       <BottomNav />
-    </div>
+    </main>
   );
 };
 
