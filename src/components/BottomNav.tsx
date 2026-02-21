@@ -1,4 +1,4 @@
-import { Home, BookOpen, LogOut, Wand2 } from 'lucide-react';
+import { Home, BookOpen, LogOut, Wand2, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ const BottomNav = () => {
     { icon: Home, label: t('nav.home'), path: '/' },
     { icon: Wand2, label: t('nav.edit'), path: '/edit-recipe' },
     { icon: BookOpen, label: t('nav.recipes'), path: '/recipes' },
+    { icon: Settings, label: t('nav.settings'), path: '/settings' },
   ];
 
   return (

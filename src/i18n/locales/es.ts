@@ -20,6 +20,7 @@ export default {
     edit: 'Editar',
     recipes: 'Recetas',
     logout: 'Salir',
+    settings: 'Ajustes',
   },
   auth: {
     login: 'Iniciar Sesión',
@@ -128,5 +129,18 @@ export default {
     de: 'Deutsch',
     it: 'Italiano',
     fr: 'Français',
+  },
+  settings: {
+    title: 'Configuración',
+    language: 'Idioma',
+    theme: 'Tema',
+    light: 'Claro',
+    dark: 'Oscuro',
+    system: 'Sistema',
+    fontSize: 'Tamaño de Fuente',
+    small: 'Pequeño',
+    mediumSize: 'Mediano',
+    largeSize: 'Grande',
+    fontFamily: 'Fuente',
   },
 } as const;
