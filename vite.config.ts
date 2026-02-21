@@ -20,9 +20,10 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "icons/icon-192.png", "icons/icon-512.png"],
+      includeAssets: ["favicon.ico", "icons/icon-192.png", "icons/icon-512.png", "offline.html"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff2}"],
+        navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/~oauth/],
         runtimeCaching: [
           {
@@ -31,11 +32,20 @@ export default defineConfig(({ mode }) => ({
             options: {
               cacheName: "supabase-api",
               expiration: { maxEntries: 50, maxAgeSeconds: 300 },
+              networkTimeoutSeconds: 10,
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "google-fonts",
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
           },
         ],
       },
-      manifest: false, // we already have public/manifest.json
+      manifest: false,
     }),
   ].filter(Boolean),
   resolve: {
