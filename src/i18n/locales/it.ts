@@ -20,6 +20,7 @@ export default {
     edit: 'Modifica',
     recipes: 'Ricette',
     logout: 'Esci',
+    settings: 'Impost.',
   },
   auth: {
     login: 'Accedi',
@@ -128,5 +129,18 @@ export default {
     de: 'Deutsch',
     it: 'Italiano',
     fr: 'Français',
+  },
+  settings: {
+    title: 'Impostazioni',
+    language: 'Lingua',
+    theme: 'Tema',
+    light: 'Chiaro',
+    dark: 'Scuro',
+    system: 'Sistema',
+    fontSize: 'Dimensione Carattere',
+    small: 'Piccolo',
+    mediumSize: 'Medio',
+    largeSize: 'Grande',
+    fontFamily: 'Carattere',
   },
 } as const;
