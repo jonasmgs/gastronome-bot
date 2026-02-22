@@ -61,7 +61,8 @@ export default {
   },
   recipes: {
     title: 'Mis Recetas',
-    count: '{{count}} receta(s) guardada(s)',
+    count_one: '{{count}} receta guardada',
+    count_other: '{{count}} recetas guardadas',
     noRecipes: 'Aún no hay recetas guardadas',
     deleteError: 'Error al eliminar',
     deleted: 'Receta eliminada',

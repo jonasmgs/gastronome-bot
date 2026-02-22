@@ -61,7 +61,8 @@ export default {
   },
   recipes: {
     title: 'Meine Rezepte',
-    count: '{{count}} gespeicherte(s) Rezept(e)',
+    count_one: '{{count}} gespeichertes Rezept',
+    count_other: '{{count}} gespeicherte Rezepte',
     noRecipes: 'Noch keine gespeicherten Rezepte',
     deleteError: 'Fehler beim Löschen',
     deleted: 'Rezept gelöscht',

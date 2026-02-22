@@ -61,7 +61,8 @@ export default {
   },
   recipes: {
     title: 'Mes Recettes',
-    count: '{{count}} recette(s) sauvegardée(s)',
+    count_one: '{{count}} recette sauvegardée',
+    count_other: '{{count}} recettes sauvegardées',
     noRecipes: 'Aucune recette sauvegardée',
     deleteError: 'Erreur lors de la suppression',
     deleted: 'Recette supprimée',

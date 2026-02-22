@@ -61,7 +61,8 @@ export default {
   },
   recipes: {
     title: 'My Recipes',
-    count: '{{count}} saved recipe(s)',
+    count_one: '{{count}} saved recipe',
+    count_other: '{{count}} saved recipes',
     noRecipes: 'No saved recipes yet',
     deleteError: 'Error deleting',
     deleted: 'Recipe deleted',
