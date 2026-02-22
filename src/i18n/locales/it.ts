@@ -61,7 +61,8 @@ export default {
   },
   recipes: {
     title: 'Le Mie Ricette',
-    count: '{{count}} ricetta/e salvata/e',
+    count_one: '{{count}} ricetta salvata',
+    count_other: '{{count}} ricette salvate',
     noRecipes: 'Nessuna ricetta salvata ancora',
     deleteError: 'Errore durante l\'eliminazione',
     deleted: 'Ricetta eliminata',

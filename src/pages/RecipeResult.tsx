@@ -190,7 +190,7 @@ const RecipeResult = () => {
           <button onClick={() => navigate('/')} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label={t('common.cancel')}>
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <h1 className="flex-1 text-lg font-bold text-foreground truncate">{recipe.recipe_name}</h1>
+          <h1 className="flex-1 text-base font-bold text-foreground line-clamp-2 leading-tight">{recipe.recipe_name}</h1>
           <button onClick={handleShare} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label="Share">
             <Share2 className="h-4 w-4" />
           </button>
@@ -342,7 +342,7 @@ const RecipeResult = () => {
       {/* Chat FAB */}
       <button
         onClick={() => setChatOpen(true)}
-        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all active:scale-95 hover:shadow-xl"
+        className="fixed bottom-24 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all active:scale-95 hover:shadow-xl"
         aria-label={t('recipe.askChef')}
       >
         <MessageCircle className="h-6 w-6" />

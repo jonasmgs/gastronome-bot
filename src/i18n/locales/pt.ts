@@ -61,7 +61,8 @@ export default {
   },
   recipes: {
     title: 'Minhas Receitas',
-    count: '{{count}} receita(s) salva(s)',
+    count_one: '{{count}} receita salva',
+    count_other: '{{count}} receitas salvas',
     noRecipes: 'Nenhuma receita salva ainda',
     deleteError: 'Erro ao excluir',
     deleted: 'Receita excluída',
