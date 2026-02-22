@@ -45,7 +45,7 @@ export default {
     dishType: 'Tipo de prato',
     complexity: 'Complexidade',
     salad: 'Salada',
-    dessert: 'Sobremesa',
+    dessert: 'Doce',
     savory: 'Salgado',
     snack: 'Lanche',
     simple: 'Simples',
