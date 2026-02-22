@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Flame, Share2, Check, Clock, ChefHat, Users, Gauge, Leaf, WheatOff, MilkOff, Loader2, Wand2, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Flame, Share2, Check, Clock, ChefHat, Users, Gauge, Leaf, WheatOff, MilkOff, Loader2, Wand2, MessageCircle, Pencil } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import type { Tables } from '@/integrations/supabase/types';
 import BottomNav from '@/components/BottomNav';
 import RecipeChat from '@/components/RecipeChat';
+import RecipeEditDrawer from '@/components/RecipeEditDrawer';
 import bgUtensils from '@/assets/bg-utensils.jpg';
 
 interface Ingredient {
@@ -55,6 +56,7 @@ const RecipeResult = () => {
   const [transforming, setTransforming] = useState(false);
   const [filters, setFilters] = useState<DietaryFilters>({ vegan: false, glutenFree: false, lactoseFree: false });
   const [chatOpen, setChatOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   usePageTitle(recipe?.recipe_name);
 
@@ -191,6 +193,9 @@ const RecipeResult = () => {
             <ArrowLeft className="h-4 w-4" />
           </button>
           <h1 className="flex-1 text-base font-bold text-foreground line-clamp-2 leading-tight">{recipe.recipe_name}</h1>
+          <button onClick={() => setEditOpen(true)} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label={t('recipe.editRecipe')}>
+            <Pencil className="h-4 w-4" />
+          </button>
           <button onClick={handleShare} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label="Share">
             <Share2 className="h-4 w-4" />
           </button>
@@ -362,6 +367,21 @@ const RecipeResult = () => {
             open={chatOpen}
             onClose={() => setChatOpen(false)}
             onRecipeUpdated={fetchRecipe}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {editOpen && (
+          <RecipeEditDrawer
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            recipeId={recipe.id}
+            recipeName={recipe.recipe_name}
+            ingredients={ingredients}
+            preparation={recipe.preparation}
+            onRecipeUpdated={fetchRecipe}
+            onOpenChat={() => setChatOpen(true)}
           />
         )}
       </AnimatePresence>
