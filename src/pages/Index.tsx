@@ -248,7 +248,7 @@ const Index = () => {
         {ingredients.length >= 2 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="px-5">
             <button
-              onClick={generateRecipe}
+              onClick={handleGenerateClick}
               disabled={generating}
               aria-busy={generating}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98] disabled:opacity-50"
@@ -258,6 +258,48 @@ const Index = () => {
             </button>
           </motion.div>
         )}
+
+        {/* Servings Modal */}
+        <AnimatePresence>
+          {showServingsModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6"
+              onClick={() => setShowServingsModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-xl"
+              >
+                <h3 className="text-lg font-semibold text-card-foreground mb-1">{t('home.servingsTitle')}</h3>
+                <p className="text-sm text-muted-foreground mb-5">{t('home.servingsDescription')}</p>
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <button
+                    onClick={() => setServings(Math.max(1, servings - 1))}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-foreground text-lg font-bold transition-colors hover:bg-accent"
+                  >−</button>
+                  <span className="text-3xl font-bold text-foreground w-12 text-center">{servings}</span>
+                  <button
+                    onClick={() => setServings(Math.min(20, servings + 1))}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-foreground text-lg font-bold transition-colors hover:bg-accent"
+                  >+</button>
+                </div>
+                <button
+                  onClick={generateRecipe}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-lg transition-all active:scale-[0.98]"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {t('home.generate')}
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <BottomNav />

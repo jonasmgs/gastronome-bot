@@ -146,11 +146,14 @@ REGRAS IMPORTANTES:
 
 Retorne exclusivamente em JSON válido, sem texto adicional.`;
     } else {
+      const safeServings = (typeof servings === 'number' && servings >= 1 && servings <= 20) ? servings : 2;
       prompt = `${chefPersona}
 
 Com base nos seguintes ingredientes:
 ${sanitizedIngredients.join(', ')}
 ${categoryInstruction}${complexityInstruction}${filterInstructions}
+
+NÚMERO DE PORÇÕES OBRIGATÓRIO: A receita DEVE render exatamente ${safeServings} porção(ões). Todas as quantidades de ingredientes devem ser proporcionais a ${safeServings} porção(ões).
 
 Crie apenas UMA receita completa e MUITO detalhada.
 

@@ -58,6 +58,8 @@ export default {
     generating: 'Gerando receita...',
     generate: 'Gerar Receita',
     errorGenerating: 'Erro ao gerar receita',
+    servingsTitle: 'Quantas porções?',
+    servingsDescription: 'A receita será calculada para o número de porções escolhido',
   },
   recipes: {
     title: 'Minhas Receitas',

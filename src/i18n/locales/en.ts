@@ -58,6 +58,8 @@ export default {
     generating: 'Generating recipe...',
     generate: 'Generate Recipe',
     errorGenerating: 'Error generating recipe',
+    servingsTitle: 'How many servings?',
+    servingsDescription: 'The recipe will be calculated for the chosen number of servings',
   },
   recipes: {
     title: 'My Recipes',

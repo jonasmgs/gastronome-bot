@@ -194,10 +194,36 @@ const RecipeResult = () => {
           <button onClick={() => navigate('/')} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label={t('common.cancel')}>
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <h1 className="flex-1 text-base font-bold text-foreground line-clamp-2 leading-tight">{recipe.recipe_name}</h1>
-          <button onClick={() => setEditOpen(true)} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label={t('recipe.editRecipe')}>
-            <Pencil className="h-4 w-4" />
-          </button>
+          {editingName ? (
+            <input
+              autoFocus
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onBlur={async () => {
+                const trimmed = editedName.trim();
+                if (trimmed && trimmed !== recipe.recipe_name) {
+                  await supabase.from('recipes').update({ recipe_name: trimmed }).eq('id', recipe.id);
+                  fetchRecipe();
+                  toast.success(t('recipe.saved'));
+                }
+                setEditingName(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                if (e.key === 'Escape') setEditingName(false);
+              }}
+              className="flex-1 text-base font-bold text-foreground bg-transparent border-b-2 border-primary outline-none py-1"
+            />
+          ) : (
+            <h1
+              className="flex-1 text-base font-bold text-foreground line-clamp-2 leading-tight cursor-pointer"
+              onClick={() => { setEditedName(recipe.recipe_name); setEditingName(true); }}
+              title={t('recipe.editRecipeName')}
+            >
+              {recipe.recipe_name}
+              <Pencil className="inline ml-1.5 h-3 w-3 text-muted-foreground" />
+            </h1>
+          )}
           <button onClick={handleShare} className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-foreground" aria-label="Share">
             <Share2 className="h-4 w-4" />
           </button>
