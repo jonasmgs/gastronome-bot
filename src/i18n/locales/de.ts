@@ -58,6 +58,8 @@ export default {
     generating: 'Rezept wird erstellt...',
     generate: 'Rezept erstellen',
     errorGenerating: 'Fehler beim Erstellen des Rezepts',
+    servingsTitle: 'Wie viele Portionen?',
+    servingsDescription: 'Das Rezept wird für die gewählte Portionsanzahl berechnet',
   },
   recipes: {
     title: 'Meine Rezepte',
@@ -87,6 +89,7 @@ export default {
     tip: 'Tipp',
     askChef: 'Den Chef zu diesem Rezept fragen',
     editRecipe: 'Rezept bearbeiten',
+    editRecipeName: 'Klicken zum Bearbeiten',
     editManual: 'Manuell bearbeiten',
     editWithAI: 'Mit KI bearbeiten',
     editDescription: 'Felder direkt bearbeiten oder den KI-Chat für intelligente Vorschläge nutzen',

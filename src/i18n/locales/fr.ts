@@ -58,6 +58,8 @@ export default {
     generating: 'Génération de la recette...',
     generate: 'Générer la Recette',
     errorGenerating: 'Erreur lors de la génération de la recette',
+    servingsTitle: 'Combien de portions ?',
+    servingsDescription: 'La recette sera calculée pour le nombre de portions choisi',
   },
   recipes: {
     title: 'Mes Recettes',
@@ -87,6 +89,7 @@ export default {
     tip: 'Conseil',
     askChef: 'Demander au chef à propos de cette recette',
     editRecipe: 'Modifier la Recette',
+    editRecipeName: 'Cliquez pour modifier le nom',
     editManual: 'Modification Manuelle',
     editWithAI: 'Modifier avec l\'IA',
     editDescription: 'Modifiez les champs directement ou utilisez le chat IA pour des suggestions intelligentes',

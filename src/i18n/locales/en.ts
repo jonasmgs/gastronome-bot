@@ -58,6 +58,8 @@ export default {
     generating: 'Generating recipe...',
     generate: 'Generate Recipe',
     errorGenerating: 'Error generating recipe',
+    servingsTitle: 'How many servings?',
+    servingsDescription: 'The recipe will be calculated for the chosen number of servings',
   },
   recipes: {
     title: 'My Recipes',
@@ -87,6 +89,7 @@ export default {
     tip: 'Tip',
     askChef: 'Ask the chef about this recipe',
     editRecipe: 'Edit Recipe',
+    editRecipeName: 'Click to edit name',
     editManual: 'Manual Edit',
     editWithAI: 'Edit with AI',
     editDescription: 'Edit fields directly or use the AI chat for smart suggestions',
