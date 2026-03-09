@@ -59,15 +59,20 @@ const Index = () => {
     }
   };
 
-  const generateRecipe = async () => {
+  const handleGenerateClick = () => {
     if (ingredients.length < 2) {
       toast.error(t('home.minIngredients'));
       return;
     }
+    setShowServingsModal(true);
+  };
+
+  const generateRecipe = async () => {
+    setShowServingsModal(false);
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
-        body: { ingredients, category, complexity },
+        body: { ingredients, category, complexity, servings },
       });
       if (error) throw error;
 
@@ -88,7 +93,7 @@ const Index = () => {
           difficulty: recipe.difficulty || '',
           prep_time: recipe.prep_time || '',
           cook_time: recipe.cook_time || '',
-          servings: recipe.servings || 0,
+          servings: recipe.servings || servings,
           steps: recipe.steps || [],
         }),
       }).select().single();
