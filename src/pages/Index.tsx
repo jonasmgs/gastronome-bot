@@ -31,6 +31,8 @@ const Index = () => {
   const [category, setCategory] = useState<string | null>(null);
   const [complexity, setComplexity] = useState<string | null>(null);
   const [currentBg, setCurrentBg] = useState(0);
+  const [servings, setServings] = useState<number>(2);
+  const [showServingsModal, setShowServingsModal] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
