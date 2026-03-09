@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { ingredients, mode, filters, existing_recipe, category, complexity } = body;
+    const { ingredients, mode, filters, existing_recipe, category, complexity, servings } = body;
 
     // mode: "generate" (default) | "transform"
     const isTransform = mode === 'transform';
