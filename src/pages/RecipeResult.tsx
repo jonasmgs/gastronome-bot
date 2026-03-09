@@ -57,6 +57,8 @@ const RecipeResult = () => {
   const [filters, setFilters] = useState<DietaryFilters>({ vegan: false, glutenFree: false, lactoseFree: false });
   const [chatOpen, setChatOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [editedName, setEditedName] = useState('');
 
   usePageTitle(recipe?.recipe_name);
 
