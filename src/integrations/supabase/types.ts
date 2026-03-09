@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      nutrition_profiles: {
+        Row: {
+          age: number | null
+          allergies: string[] | null
+          created_at: string
+          goal: string | null
+          height_cm: number | null
+          id: string
+          sex: string | null
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          age?: number | null
+          allergies?: string[] | null
+          created_at?: string
+          goal?: string | null
+          height_cm?: number | null
+          id?: string
+          sex?: string | null
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          age?: number | null
+          allergies?: string[] | null
+          created_at?: string
+          goal?: string | null
+          height_cm?: number | null
+          id?: string
+          sex?: string | null
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
