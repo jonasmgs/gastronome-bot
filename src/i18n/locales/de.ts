@@ -89,6 +89,7 @@ export default {
     tip: 'Tipp',
     askChef: 'Den Chef zu diesem Rezept fragen',
     editRecipe: 'Rezept bearbeiten',
+    editRecipeName: 'Klicken zum Bearbeiten',
     editManual: 'Manuell bearbeiten',
     editWithAI: 'Mit KI bearbeiten',
     editDescription: 'Felder direkt bearbeiten oder den KI-Chat für intelligente Vorschläge nutzen',

@@ -89,6 +89,7 @@ export default {
     tip: 'Dica',
     askChef: 'Perguntar ao chef sobre esta receita',
     editRecipe: 'Editar Receita',
+    editRecipeName: 'Clique para editar o nome',
     editManual: 'Edição Manual',
     editWithAI: 'Editar com IA',
     editDescription: 'Edite os campos diretamente ou use o chat com a IA para sugestões inteligentes',
