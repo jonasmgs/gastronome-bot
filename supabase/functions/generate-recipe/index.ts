@@ -26,8 +26,8 @@ serve(async (req) => {
     const body = await req.json();
     const { ingredients, mode, filters, existing_recipe, category, complexity, servings, nutritionMode, nutritionProfile } = body;
 
-    // mode: "generate" (default) | "transform"
     const isTransform = mode === 'transform';
+    const isNutritionMode = nutritionMode === true;
 
     let sanitizedIngredients: string[] = [];
 
