@@ -145,6 +145,34 @@ REGRAS IMPORTANTES:
 - Mantenha o sabor e a essência o mais próximo possível do original, apenas substituindo os ingredientes incompatíveis
 
 Retorne exclusivamente em JSON válido, sem texto adicional.`;
+    } else if (isNutritionMode && nutritionProfile) {
+      const np = nutritionProfile;
+      const allergiesText = np.allergies?.length > 0
+        ? `\n\nALERGIAS E RESTRIÇÕES OBRIGATÓRIAS — A receita NÃO PODE conter nenhum dos seguintes alérgenos:\n${np.allergies.map((a: string) => `- ${a}`).join('\n')}\nSe algum ingrediente típico da receita conflitar com essas restrições, substitua-o e explique a substituição.`
+        : '';
+      const goalMap: Record<string, string> = {
+        weight_loss: 'PERDA DE PESO — receita com baixo teor calórico, rica em fibras e proteínas magras, evitando carboidratos refinados e gorduras saturadas',
+        muscle_gain: 'GANHO DE MASSA MUSCULAR — receita hiperproteica com carboidratos complexos e gorduras saudáveis',
+        maintenance: 'MANUTENÇÃO — receita balanceada em macronutrientes',
+        general_health: 'SAÚDE GERAL — receita nutritiva, variada e equilibrada seguindo diretrizes da OMS',
+      };
+      const goalText = goalMap[np.goal] || goalMap['general_health'];
+      prompt = `${chefPersona}
+
+Crie uma receita PERSONALIZADA para o seguinte perfil nutricional:
+- Sexo: ${np.sex === 'male' ? 'Masculino' : 'Feminino'}
+- Idade: ${np.age} anos
+- Peso: ${np.weight_kg} kg
+- Altura: ${np.height_cm} cm
+- TDEE (calorias diárias): ${Math.round(np.tdee)} kcal
+- Objetivo: ${goalText}
+${allergiesText}
+
+A receita deve ter calorias proporcionais ao TDEE do usuário (aproximadamente 1/3 do TDEE para uma refeição principal).
+Deve ser uma refeição completa, saborosa e que atenda ao objetivo nutricional do usuário.
+Escolha ingredientes que sejam nutricionalmente densos e adequados ao objetivo.
+
+Retorne exclusivamente em JSON válido, sem texto adicional.`;
     } else {
       const safeServings = (typeof servings === 'number' && servings >= 1 && servings <= 20) ? servings : 2;
       prompt = `${chefPersona}

@@ -307,6 +307,24 @@ const NutritionProfile = () => {
           </section>
         )}
 
+        {/* Personalized Recipe Generator */}
+        {canCalc && tdee && (
+          <NutritionRecipeGenerator
+            nutritionData={{
+              height_cm: Number(data.height_cm),
+              weight_kg: Number(data.weight_kg),
+              sex: data.sex as 'male' | 'female',
+              age: Number(data.age),
+              goal: data.goal as string,
+              allergies: [
+                ...data.allergies,
+                ...data.other_allergy.split(',').map(s => s.trim()).filter(Boolean),
+              ],
+              tdee,
+            }}
+          />
+        )}
+
         {/* Save */}
         <button
           onClick={handleSave}
