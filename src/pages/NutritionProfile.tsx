@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import BottomNav from '@/components/BottomNav';
+import NutritionRecipeGenerator from '@/components/NutritionRecipeGenerator';
 
 const ALLERGY_OPTIONS = [
   'gluten', 'lactose', 'seafood', 'peanut', 'eggs', 'soy', 'nuts',
