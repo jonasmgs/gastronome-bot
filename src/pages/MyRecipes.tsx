@@ -16,6 +16,7 @@ const MyRecipes = () => {
   const { t, i18n } = useTranslation();
   usePageTitle(t('recipes.title'));
   const { user } = useAuth();
+  const { name: userName } = useProfile();
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState<Tables<'recipes'>[]>([]);
   const [loading, setLoading] = useState(true);
