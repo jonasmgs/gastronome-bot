@@ -86,7 +86,36 @@ const RecipeResult = () => {
 
   const handleShare = async () => {
     if (!recipe) return;
-    const text = `🍽️ ${recipe.recipe_name}\n🔥 ${recipe.calories_total} kcal\n\nFeito com Gastronom.IA`;
+    const ingredients = (recipe.ingredients as unknown as Ingredient[]) || [];
+    let meta: RecipeMeta = {};
+    try { meta = JSON.parse(recipe.nutrition_info || '{}'); } catch { meta = {}; }
+    const steps = meta.steps || [];
+
+    let text = `🍽️ ${recipe.recipe_name}\n`;
+    text += `🔥 ${recipe.calories_total} kcal\n`;
+    if (meta.difficulty) text += `📊 ${t('recipe.difficulty')}: ${meta.difficulty}\n`;
+    if (meta.prep_time) text += `⏱️ ${t('common.prep')}: ${meta.prep_time}\n`;
+    if (meta.cook_time) text += `🕐 ${t('common.cooking')}: ${meta.cook_time}\n`;
+    if (meta.servings) text += `👥 ${meta.servings} ${t('common.portions')}\n`;
+    text += `\n${t('recipe.ingredients')}\n`;
+    ingredients.forEach(ing => {
+      text += `• ${ing.name} — ${ing.quantity} (${ing.calories} kcal)\n`;
+    });
+    text += `\n${t('recipe.stepByStep')}\n`;
+    if (steps.length > 0) {
+      steps.forEach(step => {
+        text += `${step.step_number}. ${step.title}: ${step.description}`;
+        if (step.duration) text += ` (${step.duration})`;
+        if (step.tip) text += `\n   💡 ${step.tip}`;
+        text += '\n\n';
+      });
+    } else {
+      text += recipe.preparation + '\n';
+    }
+    if (meta.chef_tips) text += `\n👨‍🍳 ${t('recipe.chefTips')}\n${meta.chef_tips}\n`;
+    if (meta.nutrition_info) text += `\n📊 ${t('recipe.nutritionInfo')}\n${meta.nutrition_info}\n`;
+    text += `\nFeito com Gastronom.IA`;
+
     if (navigator.share) {
       await navigator.share({ text });
     } else {

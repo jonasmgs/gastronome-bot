@@ -4,16 +4,19 @@ import { motion } from 'framer-motion';
 import { Flame, Trash2, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Tables } from '@/integrations/supabase/types';
 import BottomNav from '@/components/BottomNav';
+import RecipeBookGenerator from '@/components/RecipeBookGenerator';
 
 const MyRecipes = () => {
   const { t, i18n } = useTranslation();
   usePageTitle(t('recipes.title'));
   const { user } = useAuth();
+  const { name: userName } = useProfile();
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState<Tables<'recipes'>[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +53,11 @@ const MyRecipes = () => {
       <header className="px-5 pt-14 pb-4">
         <h1 className="text-2xl font-bold text-foreground">{t('recipes.title')}</h1>
         <p className="text-sm text-muted-foreground mt-1">{t('recipes.count', { count: recipes.length })}</p>
+        {recipes.length > 0 && (
+          <div className="mt-3">
+            <RecipeBookGenerator recipes={recipes} userName={userName || undefined} />
+          </div>
+        )}
       </header>
 
       <section className="px-5 space-y-3" aria-label={t('recipes.title')}>
