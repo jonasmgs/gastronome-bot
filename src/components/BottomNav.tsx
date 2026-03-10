@@ -17,31 +17,34 @@ const BottomNav = () => {
     { icon: Settings, label: t('nav.settings'), path: '/settings' },
   ];
 
+  const allItems = [
+    ...items,
+    { icon: LogOut, label: t('nav.logout'), path: '__logout__' },
+  ];
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/80 ios-blur safe-area-bottom">
-      <div className="mx-auto flex max-w-md items-center justify-around py-2 pb-[env(safe-area-inset-bottom,8px)]">
-        {items.map((item) => {
-          const active = location.pathname === item.path;
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/80 ios-blur overflow-hidden">
+      <div className="flex w-full items-center py-2 pb-[env(safe-area-inset-bottom,8px)]">
+        {allItems.map((item) => {
+          const isLogout = item.path === '__logout__';
+          const active = !isLogout && location.pathname === item.path;
           return (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1 text-xs transition-colors ${
-                active ? 'text-primary' : 'text-muted-foreground'
+              onClick={() => isLogout ? signOut() : navigate(item.path)}
+              className={`flex flex-1 min-w-0 flex-col items-center gap-0.5 py-1 text-[10px] transition-colors ${
+                isLogout
+                  ? 'text-muted-foreground hover:text-destructive'
+                  : active
+                    ? 'text-primary'
+                    : 'text-muted-foreground'
               }`}
             >
               <item.icon className="h-5 w-5" />
-              {item.label}
+              <span className="truncate w-full text-center">{item.label}</span>
             </button>
           );
         })}
-        <button
-          onClick={signOut}
-          className="flex flex-col items-center gap-0.5 px-4 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
-        >
-          <LogOut className="h-5 w-5" />
-          {t('nav.logout')}
-        </button>
       </div>
     </nav>
   );
