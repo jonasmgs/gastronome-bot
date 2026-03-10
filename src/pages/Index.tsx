@@ -182,7 +182,7 @@ const Index = () => {
         {/* Complexity Selector */}
         <section className="px-5 mb-4" aria-label={t('home.complexity')}>
           <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.complexity')}</p>
-          <div className="flex gap-2 overflow-x-auto pb-1" role="group">
+          <div className="flex flex-wrap gap-2 pb-1" role="group">
             {complexities.map((opt) => (
               <button
                 key={opt.id}
