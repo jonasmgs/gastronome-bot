@@ -31,7 +31,7 @@ serve(async (req) => {
 
     let sanitizedIngredients: string[] = [];
 
-    if (!isTransform) {
+    if (!isTransform && !isNutritionMode) {
       if (!ingredients || !Array.isArray(ingredients) || ingredients.length < 2) {
         return new Response(
           JSON.stringify({ error: 'Envie pelo menos 2 ingredientes' }),
