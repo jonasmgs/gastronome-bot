@@ -4,11 +4,13 @@ import { motion } from 'framer-motion';
 import { Flame, Trash2, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useProfile } from '@/hooks/useProfile';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Tables } from '@/integrations/supabase/types';
 import BottomNav from '@/components/BottomNav';
+import RecipeBookGenerator from '@/components/RecipeBookGenerator';
 
 const MyRecipes = () => {
   const { t, i18n } = useTranslation();
