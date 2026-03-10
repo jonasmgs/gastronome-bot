@@ -53,6 +53,11 @@ const MyRecipes = () => {
       <header className="px-5 pt-14 pb-4">
         <h1 className="text-2xl font-bold text-foreground">{t('recipes.title')}</h1>
         <p className="text-sm text-muted-foreground mt-1">{t('recipes.count', { count: recipes.length })}</p>
+        {recipes.length > 0 && (
+          <div className="mt-3">
+            <RecipeBookGenerator recipes={recipes} userName={userName || undefined} />
+          </div>
+        )}
       </header>
 
       <section className="px-5 space-y-3" aria-label={t('recipes.title')}>
