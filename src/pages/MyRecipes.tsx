@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Flame, Trash2, BookOpen } from 'lucide-react';
+import { Flame, Trash2, BookOpen, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
@@ -11,6 +11,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Tables } from '@/integrations/supabase/types';
 import BottomNav from '@/components/BottomNav';
 import RecipeBookGenerator from '@/components/RecipeBookGenerator';
+import RecipeBookViewer from '@/components/RecipeBookViewer';
 
 const MyRecipes = () => {
   const { t, i18n } = useTranslation();
@@ -20,6 +21,7 @@ const MyRecipes = () => {
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState<Tables<'recipes'>[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookOpen, setBookOpen] = useState(false);
 
   const fetchRecipes = async () => {
     if (!user) return;
@@ -54,8 +56,15 @@ const MyRecipes = () => {
         <h1 className="text-2xl font-bold text-foreground">{t('recipes.title')}</h1>
         <p className="text-sm text-muted-foreground mt-1">{t('recipes.count', { count: recipes.length })}</p>
         {recipes.length > 0 && (
-          <div className="mt-3">
+          <div className="mt-3 space-y-2">
             <RecipeBookGenerator recipes={recipes} userName={userName || undefined} />
+            <button
+              onClick={() => setBookOpen(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-sm font-semibold text-foreground shadow-sm transition-all active:scale-[0.98]"
+            >
+              <Eye className="h-4 w-4" />
+              {t('book.readBook')}
+            </button>
           </div>
         )}
       </header>
@@ -102,6 +111,13 @@ const MyRecipes = () => {
           </ul>
         )}
       </section>
+
+      <RecipeBookViewer
+        recipes={recipes}
+        userName={userName || undefined}
+        open={bookOpen}
+        onClose={() => setBookOpen(false)}
+      />
 
       <BottomNav />
     </main>

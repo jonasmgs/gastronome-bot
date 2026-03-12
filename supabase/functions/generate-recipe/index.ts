@@ -12,7 +12,6 @@ serve(async (req) => {
   }
 
   try {
-    // Auth check
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Não autorizado' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -24,7 +23,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { ingredients, mode, filters, existing_recipe, category, complexity, servings, nutritionMode, nutritionProfile } = body;
+    const { ingredients, mode, filters, existing_recipe, category, complexity, servings, nutritionMode, nutritionProfile, description, dishType } = body;
 
     const isTransform = mode === 'transform';
     const isNutritionMode = nutritionMode === true;
@@ -39,7 +38,6 @@ serve(async (req) => {
         );
       }
 
-      // Validate and sanitize each ingredient
       sanitizedIngredients = ingredients
         .filter((ing: unknown) => typeof ing === 'string')
         .map((ing: string) => ing.trim().replace(/[^\p{L}\p{N}\s\-,.'()áàâãéèêíïóôõúüçñ]/gu, ''))
@@ -69,8 +67,7 @@ serve(async (req) => {
       }
     }
 
-    // Validate category and complexity against allowed values
-    const allowedCategories = ['salada', 'sobremesa', 'salgado', 'lanche'];
+    const allowedCategories = ['salada', 'sobremesa', 'salgado', 'lanche', 'sopa', 'molho'];
     const allowedComplexities = ['simples', 'media', 'elaborada'];
     const safeCategory = (typeof category === 'string' && allowedCategories.includes(category)) ? category : null;
     const safeComplexity = (typeof complexity === 'string' && allowedComplexities.includes(complexity)) ? complexity : null;
@@ -83,17 +80,18 @@ serve(async (req) => {
       );
     }
 
-    // Build dietary filter instructions
     const activeFilters: string[] = [];
     if (filters?.vegan) activeFilters.push('VEGANA (sem nenhum ingrediente de origem animal)');
     if (filters?.glutenFree) activeFilters.push('SEM GLÚTEN (substitua qualquer ingrediente com glúten por alternativas sem glúten)');
     if (filters?.lactoseFree) activeFilters.push('SEM LACTOSE (substitua qualquer ingrediente com lactose por alternativas sem lactose)');
 
     const categoryMap: Record<string, string> = {
-      salada: 'SALADA GOURMET — Prato fresco e sofisticado com base em folhas nobres, vegetais grelhados ou crus, proteínas leves (frango desfiado, camarão, ovo pochê), molhos autorais (vinagrete de maracujá, tahine, mostarda e mel). Deve ser visualmente bonita, com texturas contrastantes (crocante + macio) e temperos frescos.',
-      sobremesa: 'SOBREMESA/DOCE DE CONFEITARIA — Receita doce elaborada como bolo, torta, mousse, pudim, cheesecake, brownie, pavê, sorvete caseiro, crème brûlée ou similar. Deve ter camadas de sabor, boa apresentação e técnicas de confeitaria (banho-maria, chantilly, calda, cobertura, etc).',
-      salgado: 'PRATO PRINCIPAL SALGADO — Refeição completa e substanciosa como risoto, massa, carne assada, estrogonofe, moqueca, escondidinho, lasanha, frango recheado, etc. Deve ser um prato quente, reconfortante e digno de restaurante.',
-      lanche: 'LANCHE ELABORADO — Sanduíche gourmet, hambúrguer artesanal, wrap recheado, bruschetta, croissant recheado, panini, taco, quesadilla ou similar. NÃO pode ser apenas ingredientes simples empilhados. Deve ter molho especial, combinação criativa de sabores e montagem caprichada.',
+      salada: 'SALADA GOURMET — Prato fresco e sofisticado com base em folhas nobres, vegetais grelhados ou crus, proteínas leves, molhos autorais.',
+      sobremesa: 'SOBREMESA/DOCE DE CONFEITARIA — Receita doce elaborada como bolo, torta, mousse, pudim, cheesecake, brownie.',
+      salgado: 'PRATO PRINCIPAL SALGADO — Refeição completa e substanciosa como risoto, massa, carne assada, estrogonofe, moqueca.',
+      lanche: 'LANCHE ELABORADO — Sanduíche gourmet, hambúrguer artesanal, wrap recheado, bruschetta, panini.',
+      sopa: 'SOPA OU CALDO — Sopa cremosa, caldo nutritivo, consomê, velouté, minestrone ou similar.',
+      molho: 'MOLHO GOURMET — Molho sofisticado como pesto, chimichurri, beurre blanc, redução de vinho, molho de ervas, vinagrete especial, aioli, etc.',
     };
 
     const categoryInstruction = safeCategory && categoryMap[safeCategory]
@@ -101,9 +99,9 @@ serve(async (req) => {
       : '';
 
     const complexityMap: Record<string, string> = {
-      simples: 'RECEITA SIMPLES — Poucos ingredientes, preparo rápido (até 20 min), técnicas básicas do dia a dia, ideal para quem tem pouca experiência na cozinha. Máximo 4-5 passos.',
-      media: 'RECEITA DE COMPLEXIDADE MÉDIA — Ingredientes variados, preparo moderado (20-45 min), algumas técnicas intermediárias (refogar, gratinar, montar camadas). Entre 5-7 passos.',
-      elaborada: 'RECEITA ELABORADA — Ingredientes sofisticados, preparo demorado (45+ min), técnicas avançadas de alta gastronomia (selar, flambar, reduzir, confitar, sous vide). Apresentação refinada, molhos autorais, 7-10 passos detalhados.',
+      simples: 'RECEITA SIMPLES — Poucos ingredientes, preparo rápido (até 20 min), técnicas básicas.',
+      media: 'RECEITA DE COMPLEXIDADE MÉDIA — Ingredientes variados, preparo moderado (20-45 min).',
+      elaborada: 'RECEITA ELABORADA — Ingredientes sofisticados, preparo demorado (45+ min), técnicas avançadas.',
     };
 
     const complexityInstruction = safeComplexity && complexityMap[safeComplexity]
@@ -111,23 +109,20 @@ serve(async (req) => {
       : '';
 
     const filterInstructions = activeFilters.length > 0
-      ? `\n\nFILTROS OBRIGATÓRIOS - A receita DEVE ser:\n${activeFilters.map(f => `- ${f}`).join('\n')}\n\nSubstitua ingredientes incompatíveis por alternativas adequadas. Mencione as substituições feitas.`
+      ? `\n\nFILTROS OBRIGATÓRIOS - A receita DEVE ser:\n${activeFilters.map(f => `- ${f}`).join('\n')}\nSubstitua ingredientes incompatíveis por alternativas adequadas.`
       : '';
 
     let prompt: string;
 
-    const chefPersona = `Você é um chef profissional com formação em gastronomia clássica francesa e brasileira, com 20 anos de experiência em restaurantes estrelados. Você NUNCA sugere técnicas incorretas. Você domina todas as técnicas culinárias: sauté, braise, roasting, grilling, poaching, blanching, flambar, gratinar, confitar, defumar, sous vide, etc.
+    const chefPersona = `Você é um chef profissional com formação em gastronomia clássica francesa e brasileira, com 20 anos de experiência em restaurantes estrelados. Você NUNCA sugere técnicas incorretas. Você domina todas as técnicas culinárias.
 
 REGRAS TÉCNICAS OBRIGATÓRIAS:
-- NUNCA sugira ferver carnes ou almôndegas em água pura — use técnicas corretas como selar/dourar em frigideira com óleo quente, assar no forno, ou cozinhar em molho (braise)
-- Almôndegas devem ser SELADAS em frigideira com azeite/óleo em fogo alto para criar crosta (reação de Maillard), depois finalizadas no forno ou no molho
-- Carnes devem ser temperadas com antecedência, seladas em alta temperatura para caramelização
-- Use terminologia gastronômica correta: selar, saltear, refogar, brasear, glasear, reduzir, deglacear, emulsificar, etc.
-- Cada passo deve explicar o PORQUÊ da técnica (ex: "sele em fogo alto para criar a crosta via reação de Maillard, preservando os sucos internos")
-- Indique temperaturas específicas do forno e tempos precisos
-- Sugira pontos de cocção corretos para cada proteína
-- Use combinações de sabor sofisticadas e equilibradas (ácido, doce, salgado, umami, amargo)
-- Seja criativo nos nomes e nas combinações, evitando receitas genéricas`;
+- NUNCA sugira ferver carnes em água pura — use técnicas corretas como selar/dourar
+- Carnes devem ser temperadas com antecedência, seladas em alta temperatura
+- Use terminologia gastronômica correta
+- Cada passo deve explicar o PORQUÊ da técnica
+- Indique temperaturas específicas e tempos precisos
+- Use combinações de sabor sofisticadas e equilibradas`;
 
     if (isTransform) {
       prompt = `${chefPersona}
@@ -139,24 +134,45 @@ ${existing_recipe}
 ${filterInstructions}
 
 REGRAS IMPORTANTES:
-- Crie um NOVO NOME criativo para a receita transformada que reflita as mudanças (ex: se virou vegana, o nome deve indicar isso)
-- O nome NÃO pode ser igual ao original
-- MANTENHA A MESMA CATEGORIA da receita original: se é um prato salgado, a versão transformada DEVE continuar sendo salgada. Se é uma sobremesa/doce, DEVE continuar sendo sobremesa/doce. NUNCA transforme um prato salgado em doce ou vice-versa.
-- Mantenha o sabor e a essência o mais próximo possível do original, apenas substituindo os ingredientes incompatíveis
+- Crie um NOVO NOME criativo para a receita transformada
+- MANTENHA A MESMA CATEGORIA da receita original
 
 Retorne exclusivamente em JSON válido, sem texto adicional.`;
     } else if (isNutritionMode && nutritionProfile) {
       const np = nutritionProfile;
       const allergiesText = np.allergies?.length > 0
-        ? `\n\nALERGIAS E RESTRIÇÕES OBRIGATÓRIAS — A receita NÃO PODE conter nenhum dos seguintes alérgenos:\n${np.allergies.map((a: string) => `- ${a}`).join('\n')}\nSe algum ingrediente típico da receita conflitar com essas restrições, substitua-o e explique a substituição.`
+        ? `\n\nALERGIAS E RESTRIÇÕES OBRIGATÓRIAS — A receita NÃO PODE conter nenhum dos seguintes alérgenos:\n${np.allergies.map((a: string) => `- ${a}`).join('\n')}`
         : '';
       const goalMap: Record<string, string> = {
-        weight_loss: 'PERDA DE PESO — receita com baixo teor calórico, rica em fibras e proteínas magras, evitando carboidratos refinados e gorduras saturadas',
-        muscle_gain: 'GANHO DE MASSA MUSCULAR — receita hiperproteica com carboidratos complexos e gorduras saudáveis',
+        weight_loss: 'PERDA DE PESO — receita com baixo teor calórico, rica em fibras e proteínas magras',
+        muscle_gain: 'GANHO DE MASSA MUSCULAR — receita hiperproteica com carboidratos complexos',
         maintenance: 'MANUTENÇÃO — receita balanceada em macronutrientes',
-        general_health: 'SAÚDE GERAL — receita nutritiva, variada e equilibrada seguindo diretrizes da OMS',
+        general_health: 'SAÚDE GERAL — receita nutritiva, variada e equilibrada',
       };
       const goalText = goalMap[np.goal] || goalMap['general_health'];
+
+      // Handle optional user ingredients
+      const userIngredients = Array.isArray(ingredients) && ingredients.length > 0
+        ? ingredients.filter((i: unknown) => typeof i === 'string' && (i as string).trim().length > 0)
+        : [];
+      const ingredientsInstruction = userIngredients.length > 0
+        ? `\n\nINGREDIENTES SOLICITADOS PELO USUÁRIO (use obrigatoriamente estes ingredientes na receita, adicionando outros conforme necessário):\n${userIngredients.join(', ')}`
+        : '';
+
+      // Handle optional description
+      const safeDescription = typeof description === 'string' && description.trim().length > 0
+        ? description.trim().substring(0, 200)
+        : null;
+      const descriptionInstruction = safeDescription
+        ? `\n\nDESCRIÇÃO DO PRATO DESEJADO PELO USUÁRIO: "${safeDescription}"\nCrie a receita inspirada nesta descrição, adaptando-a ao perfil nutricional do usuário.`
+        : '';
+
+      // Handle dish type in nutrition mode
+      const safeDishType = typeof dishType === 'string' && allowedCategories.includes(dishType) ? dishType : null;
+      const dishTypeInstruction = safeDishType && categoryMap[safeDishType]
+        ? `\n\nTIPO DE PRATO OBRIGATÓRIO: ${categoryMap[safeDishType]}`
+        : '';
+
       prompt = `${chefPersona}
 
 Crie uma receita PERSONALIZADA para o seguinte perfil nutricional:
@@ -166,11 +182,10 @@ Crie uma receita PERSONALIZADA para o seguinte perfil nutricional:
 - Altura: ${np.height_cm} cm
 - TDEE (calorias diárias): ${Math.round(np.tdee)} kcal
 - Objetivo: ${goalText}
-${allergiesText}
+${allergiesText}${ingredientsInstruction}${descriptionInstruction}${dishTypeInstruction}
 
 A receita deve ter calorias proporcionais ao TDEE do usuário (aproximadamente 1/3 do TDEE para uma refeição principal).
 Deve ser uma refeição completa, saborosa e que atenda ao objetivo nutricional do usuário.
-Escolha ingredientes que sejam nutricionalmente densos e adequados ao objetivo.
 
 Retorne exclusivamente em JSON válido, sem texto adicional.`;
     } else {
@@ -181,7 +196,7 @@ Com base nos seguintes ingredientes:
 ${sanitizedIngredients.join(', ')}
 ${categoryInstruction}${complexityInstruction}${filterInstructions}
 
-NÚMERO DE PORÇÕES OBRIGATÓRIO: A receita DEVE render exatamente ${safeServings} porção(ões). Todas as quantidades de ingredientes devem ser proporcionais a ${safeServings} porção(ões).
+NÚMERO DE PORÇÕES OBRIGATÓRIO: A receita DEVE render exatamente ${safeServings} porção(ões).
 
 Crie apenas UMA receita completa e MUITO detalhada.
 
@@ -200,21 +215,10 @@ Formato obrigatório:
   "servings": 0,
   "dietary_tags": [],
   "ingredients": [
-    {
-      "name": "",
-      "quantity": "",
-      "calories": 0,
-      "tip": ""
-    }
+    { "name": "", "quantity": "", "calories": 0, "tip": "" }
   ],
   "steps": [
-    {
-      "step_number": 1,
-      "title": "",
-      "description": "",
-      "duration": "",
-      "tip": ""
-    }
+    { "step_number": 1, "title": "", "description": "", "duration": "", "tip": "" }
   ],
   "calories_total": 0,
   "nutrition_info": "",
@@ -223,22 +227,12 @@ Formato obrigatório:
 }
 
 Regras:
-- Criar nome criativo e atraente, digno de cardápio de restaurante
-- A receita deve ser ELABORADA e SABOROSA, nunca simplista ou amadora
-- Use combinações de ingredientes que façam sentido gastronômico
-- Inclua molhos, temperos e técnicas que elevem o prato
+- Criar nome criativo e atraente
+- A receita deve ser ELABORADA e SABOROSA
 - Estimar calorias realistas por ingrediente
-- Calcular total corretamente
 - O campo "steps" deve ter pelo menos 4-6 passos detalhados
-- Cada passo deve ter título curto, descrição detalhada com técnicas culinárias, duração estimada e uma dica opcional
-- Cada ingrediente pode ter uma dica de preparo opcional
 - Incluir tempo de preparo e cozimento
-- Incluir número de porções
-- Incluir dificuldade (Fácil, Médio ou Difícil)
-- O campo "dietary_tags" deve listar os filtros aplicados (ex: ["Vegana", "Sem Glúten"])
-- O campo "chef_tips" deve conter 2-3 dicas profissionais
 - O campo "nutrition_info" deve detalhar macronutrientes
-- O campo "substitutions_made" deve listar as substituições feitas (se houver filtros aplicados), ou string vazia
 - Não escrever nada fora do JSON`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -251,7 +245,7 @@ Regras:
         model: 'llama-3.1-8b-instant',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        max_tokens: 2048,
+        max_tokens: 3000,
       }),
     });
 
@@ -267,7 +261,6 @@ Regras:
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
 
-    // Robust JSON extraction from AI response
     function extractJsonFromResponse(raw: string): Record<string, unknown> {
       let cleaned = raw
         .replace(/```json\s*/gi, '')
@@ -278,7 +271,7 @@ Regras:
       const jsonEnd = cleaned.lastIndexOf('}');
 
       if (jsonStart === -1 || jsonEnd === -1) {
-        console.error('No JSON found in AI response:', cleaned.substring(0, 300));
+        console.error('No JSON found:', cleaned.substring(0, 300));
         throw new Error('No JSON object found');
       }
 
@@ -287,7 +280,6 @@ Regras:
       try {
         return JSON.parse(cleaned);
       } catch (_e) {
-        // Repair common issues
         cleaned = cleaned
           .replace(/,\s*}/g, '}')
           .replace(/,\s*]/g, ']')
