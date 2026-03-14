@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Sparkles, Loader2, UtensilsCrossed, Salad, Cake, Beef, Sandwich, Zap, ChefHat, Crown } from 'lucide-react';
+import { Sparkles, Loader2, UtensilsCrossed } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +11,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import BottomNav from '@/components/BottomNav';
 import IngredientCard from '@/components/IngredientCard';
 import LanguageSelector from '@/components/LanguageSelector';
+import RecipeFilters from '@/components/RecipeFilters';
 import bgIngredients from '@/assets/bg-ingredients.jpg';
 import bgIngredients2 from '@/assets/bg-ingredients-2.jpg';
 import bgIngredients3 from '@/assets/bg-ingredients-3.jpg';
@@ -25,7 +26,6 @@ const Index = () => {
   const { user } = useAuth();
   const { name } = useProfile();
   const navigate = useNavigate();
-  const [ingredient, setIngredient] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
@@ -40,24 +40,6 @@ const Index = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const addIngredient = () => {
-    const trimmed = ingredient.trim();
-    if (!trimmed) return;
-    if (ingredients.includes(trimmed)) {
-      toast.error(t('home.alreadyAdded'));
-      return;
-    }
-    setIngredients((prev) => [...prev, trimmed]);
-    setIngredient('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addIngredient();
-    }
-  };
 
   const handleGenerateClick = () => {
     if (ingredients.length < 2) {
@@ -107,19 +89,6 @@ const Index = () => {
     }
   };
 
-  const categories = [
-    { id: 'salada', label: t('home.salad'), icon: Salad },
-    { id: 'sobremesa', label: t('home.dessert'), icon: Cake },
-    { id: 'salgado', label: t('home.savory'), icon: Beef },
-    { id: 'lanche', label: t('home.snack'), icon: Sandwich },
-  ];
-
-  const complexities = [
-    { id: 'simples', label: t('home.simple'), icon: Zap },
-    { id: 'media', label: t('home.medium'), icon: ChefHat },
-    { id: 'elaborada', label: t('home.elaborate'), icon: Crown },
-  ];
-
   return (
     <main className="min-h-screen bg-background pb-24 relative overflow-hidden" role="main">
       {/* Rotating Background Images */}
@@ -157,85 +126,27 @@ const Index = () => {
           </span>
         </div>
 
-        {/* Category Selector */}
-        <section className="px-5 mb-4" aria-label={t('home.dishType')}>
-          <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.dishType')}</p>
-          <div className="flex flex-wrap gap-2 pb-1" role="group">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setCategory(category === cat.id ? null : cat.id)}
-                aria-pressed={category === cat.id}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
-                  category === cat.id
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-card/80 backdrop-blur-sm border border-input text-muted-foreground'
-                }`}
-              >
-                <cat.icon className="h-3.5 w-3.5" />
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Complexity Selector */}
-        <section className="px-5 mb-4" aria-label={t('home.complexity')}>
-          <p className="text-xs font-medium text-muted-foreground mb-2">{t('home.complexity')}</p>
-          <div className="flex flex-wrap gap-2 pb-1" role="group">
-            {complexities.map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => setComplexity(complexity === opt.id ? null : opt.id)}
-                aria-pressed={complexity === opt.id}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
-                  complexity === opt.id
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-card/80 backdrop-blur-sm border border-input text-muted-foreground'
-                }`}
-              >
-                <opt.icon className="h-3.5 w-3.5" />
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
+        {/* Shared Filters */}
         <div className="px-5 mb-4">
-          <div className="flex gap-2">
-            <label className="sr-only" htmlFor="ingredient-input">{t('home.ingredientPlaceholder')}</label>
-            <input
-              id="ingredient-input"
-              type="text"
-              value={ingredient}
-              onChange={(e) => setIngredient(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={t('home.ingredientPlaceholder')}
-              className="flex-1 rounded-xl border border-input bg-card/90 backdrop-blur-sm py-3 px-4 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-            <button
-              onClick={addIngredient}
-              aria-label={t('home.ingredientPlaceholder')}
-              className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-all active:scale-95"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
-          </div>
+          <RecipeFilters
+            category={category}
+            onCategoryChange={setCategory}
+            complexity={complexity}
+            onComplexityChange={setComplexity}
+            ingredients={ingredients}
+            onIngredientsChange={setIngredients}
+          />
         </div>
 
-        {/* Ingredients List */}
+        {/* Ingredients List (visual cards) */}
         <section className="px-5 mb-6" aria-label={t('recipe.ingredients')}>
-          <AnimatePresence>
-            {ingredients.length > 0 && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-2" role="list">
-                {ingredients.map((ing) => (
-                  <IngredientCard key={ing} name={ing} onRemove={() => setIngredients((prev) => prev.filter((i) => i !== ing))} />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {ingredients.length === 0 && (
+          {ingredients.length > 0 ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-2" role="list">
+              {ingredients.map((ing) => (
+                <IngredientCard key={ing} name={ing} onRemove={() => setIngredients((prev) => prev.filter((i) => i !== ing))} />
+              ))}
+            </motion.div>
+          ) : (
             <div className="mt-12 flex flex-col items-center text-center text-muted-foreground">
               <UtensilsCrossed className="mb-3 h-12 w-12 opacity-30" aria-hidden="true" />
               <p className="text-sm">{t('home.addIngredients')}</p>

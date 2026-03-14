@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, Save, Share2, Plus, X, Salad, Cake, Beef, Sandwich, Soup, Droplets } from 'lucide-react';
+import { Sparkles, Loader2, Save, Share2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import RecipeFilters from '@/components/RecipeFilters';
 
 interface NutritionData {
   height_cm: number | '';
@@ -49,31 +49,10 @@ const NutritionRecipeGenerator = ({ nutritionData }: Props) => {
   const [recipe, setRecipe] = useState<GeneratedRecipe | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // New fields
   const [description, setDescription] = useState('');
-  const [ingredientInput, setIngredientInput] = useState('');
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [dishType, setDishType] = useState<string | null>(null);
-
-  const dishTypes = [
-    { id: 'salada', label: t('home.salad'), icon: Salad },
-    { id: 'sobremesa', label: t('home.dessert'), icon: Cake },
-    { id: 'salgado', label: t('home.savory'), icon: Beef },
-    { id: 'lanche', label: t('home.snack'), icon: Sandwich },
-    { id: 'sopa', label: t('nutrition.soup'), icon: Soup },
-    { id: 'molho', label: t('nutrition.sauce'), icon: Droplets },
-  ];
-
-  const addIngredient = () => {
-    const trimmed = ingredientInput.trim();
-    if (!trimmed) return;
-    if (ingredients.includes(trimmed)) {
-      toast.error(t('home.alreadyAdded'));
-      return;
-    }
-    setIngredients(prev => [...prev, trimmed]);
-    setIngredientInput('');
-  };
+  const [complexity, setComplexity] = useState<string | null>(null);
 
   const generate = async () => {
     setGenerating(true);
@@ -82,8 +61,8 @@ const NutritionRecipeGenerator = ({ nutritionData }: Props) => {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
         body: {
           ingredients: ingredients.length > 0 ? ingredients : [],
-          category: null,
-          complexity: null,
+          category: dishType,
+          complexity,
           servings: 2,
           nutritionMode: true,
           nutritionProfile: {
@@ -96,7 +75,7 @@ const NutritionRecipeGenerator = ({ nutritionData }: Props) => {
             height_cm: nutritionData.height_cm,
           },
           description: description.trim() || null,
-          dishType: dishType,
+          dishType,
         },
       });
       if (error) throw error;
@@ -145,13 +124,17 @@ const NutritionRecipeGenerator = ({ nutritionData }: Props) => {
     if (!recipe) return;
     let text = `🍽️ ${recipe.recipe_name}\n🔥 ${recipe.calories_total} kcal\n`;
     if (recipe.servings) text += `👥 ${recipe.servings} ${t('common.portions')}\n`;
+    if (recipe.difficulty) text += `📊 ${recipe.difficulty}\n`;
+    if (recipe.prep_time) text += `⏱️ ${t('common.prep')}: ${recipe.prep_time}\n`;
+    if (recipe.cook_time) text += `🕐 ${t('common.cooking')}: ${recipe.cook_time}\n`;
     text += `\n${t('recipe.ingredients')}\n`;
-    recipe.ingredients.forEach(i => { text += `• ${i.name} — ${i.quantity}\n`; });
+    recipe.ingredients.forEach(i => { text += `• ${i.name} — ${i.quantity} (${i.calories} kcal)\n`; });
     if (recipe.steps?.length) {
       text += `\n${t('recipe.stepByStep')}\n`;
       recipe.steps.forEach(s => { text += `${s.step_number}. ${s.title}: ${s.description}\n`; });
     }
     if (recipe.nutrition_info) text += `\n📊 ${recipe.nutrition_info}\n`;
+    if (recipe.chef_tips) text += `\n💡 ${recipe.chef_tips}\n`;
     text += `\nFeito com Gastronom.IA`;
     if (navigator.share) {
       await navigator.share({ text });
@@ -170,73 +153,17 @@ const NutritionRecipeGenerator = ({ nutritionData }: Props) => {
       </div>
       <p className="text-xs text-muted-foreground">{t('nutrition.personalizedDesc')}</p>
 
-      {/* Description input */}
-      <div>
-        <label className="text-xs text-muted-foreground mb-1 block">{t('nutrition.descriptionLabel')}</label>
-        <input
-          type="text"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          placeholder={t('nutrition.descriptionPlaceholder')}
-          className="w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Dish type selector */}
-      <div>
-        <label className="text-xs text-muted-foreground mb-2 block">{t('nutrition.dishTypeLabel')}</label>
-        <div className="flex flex-wrap gap-2">
-          {dishTypes.map(dt => (
-            <button
-              key={dt.id}
-              onClick={() => setDishType(dishType === dt.id ? null : dt.id)}
-              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
-                dishType === dt.id
-                  ? 'bg-primary text-primary-foreground shadow-md'
-                  : 'border border-input bg-card text-muted-foreground hover:bg-accent'
-              }`}
-            >
-              <dt.icon className="h-3.5 w-3.5" />
-              {dt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Ingredient input */}
-      <div>
-        <label className="text-xs text-muted-foreground mb-1 block">{t('nutrition.ingredientsLabel')}</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={ingredientInput}
-            onChange={e => setIngredientInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addIngredient(); } }}
-            placeholder={t('nutrition.ingredientPlaceholder')}
-            className="flex-1 rounded-xl border border-input bg-card px-3 py-2.5 text-sm text-card-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-          <button
-            onClick={addIngredient}
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-all active:scale-95"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-        </div>
-        <AnimatePresence>
-          {ingredients.length > 0 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap gap-1.5 mt-2">
-              {ingredients.map(ing => (
-                <span key={ing} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                  {ing}
-                  <button onClick={() => setIngredients(prev => prev.filter(i => i !== ing))}>
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      <RecipeFilters
+        category={dishType}
+        onCategoryChange={setDishType}
+        complexity={complexity}
+        onComplexityChange={setComplexity}
+        ingredients={ingredients}
+        onIngredientsChange={setIngredients}
+        description={description}
+        onDescriptionChange={setDescription}
+        showDescription
+      />
 
       <button
         onClick={generate}
