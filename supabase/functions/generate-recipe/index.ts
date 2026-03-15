@@ -248,11 +248,14 @@ Deve ser uma refeição completa, saborosa e que atenda ao objetivo nutricional 
 Retorne exclusivamente em JSON válido, sem texto adicional.`;
     } else {
       const safeServings = (typeof servings === 'number' && servings >= 1 && servings <= 20) ? servings : 2;
+      const descInstructionNormal = safeDescriptionNormal
+        ? `\n\nDESCRIÇÃO DO PRATO DESEJADO PELO USUÁRIO: "${safeDescriptionNormal}"\nCrie a receita inspirada nesta descrição usando os ingredientes fornecidos.`
+        : '';
       prompt = `${chefPersona}
 
 Com base nos seguintes ingredientes:
 ${sanitizedIngredients.join(', ')}
-${categoryInstruction}${complexityInstruction}${filterInstructions}
+${categoryInstruction}${complexityInstruction}${filterInstructions}${descInstructionNormal}
 
 NÚMERO DE PORÇÕES OBRIGATÓRIO: A receita DEVE render exatamente ${safeServings} porção(ões).
 

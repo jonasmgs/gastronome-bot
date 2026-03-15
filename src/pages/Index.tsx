@@ -136,6 +136,9 @@ const Index = () => {
             onComplexityChange={setComplexity}
             ingredients={ingredients}
             onIngredientsChange={setIngredients}
+            description={description}
+            onDescriptionChange={setDescription}
+            showDescription
           />
         </div>
 
