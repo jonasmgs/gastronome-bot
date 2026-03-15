@@ -251,6 +251,17 @@ Retorne exclusivamente em JSON válido, sem texto adicional.`;
       const descInstructionNormal = safeDescriptionNormal
         ? `\n\nDESCRIÇÃO DO PRATO DESEJADO PELO USUÁRIO: "${safeDescriptionNormal}"\nCrie a receita inspirada nesta descrição usando os ingredientes fornecidos.`
         : '';
+      const dietInstruction = dietMode === true
+        ? `\n\nMODO DIETA ATIVADO — REGRAS OBRIGATÓRIAS:
+- A receita DEVE ser leve, saudável e com baixa caloria
+- Priorizar métodos de cocção saudáveis: grelhar, assar, cozinhar no vapor, refogar com pouca gordura
+- Evitar frituras, excesso de manteiga, creme de leite integral e queijos gordurosos
+- Substituir ingredientes calóricos por versões mais leves (ex: creme de leite → iogurte natural, queijo → ricota, açúcar → adoçante culinário)
+- Aumentar proporção de vegetais, folhas e fibras
+- Reduzir porções de carboidratos refinados
+- O total calórico da receita deve ficar o mais baixo possível sem comprometer o sabor
+- Indicar claramente no campo nutrition_info que é uma receita de dieta`
+        : '';
       prompt = `${chefPersona}
 
 Com base nos seguintes ingredientes:
