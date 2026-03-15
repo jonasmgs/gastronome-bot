@@ -115,6 +115,29 @@ const RecipeFilters = ({
         </div>
       </section>
 
+      {/* Diet Mode */}
+      {onDietModeChange && (
+        <section aria-label={t('home.dietMode')}>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onDietModeChange(!dietMode)}
+              aria-pressed={dietMode}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
+                dietMode
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'bg-card/80 backdrop-blur-sm border border-input text-muted-foreground'
+              }`}
+            >
+              <Leaf className="h-3.5 w-3.5" />
+              {t('home.dietMode')}
+            </button>
+            {dietMode && (
+              <span className="text-xs text-muted-foreground">{t('home.dietModeHint')}</span>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Ingredients */}
       <div>
         <label className="text-xs font-medium text-muted-foreground mb-1 block">{t('nutrition.ingredientsLabel')}</label>

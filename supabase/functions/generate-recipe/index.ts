@@ -266,7 +266,7 @@ Retorne exclusivamente em JSON válido, sem texto adicional.`;
 
 Com base nos seguintes ingredientes:
 ${sanitizedIngredients.join(', ')}
-${categoryInstruction}${complexityInstruction}${filterInstructions}${descInstructionNormal}
+${categoryInstruction}${complexityInstruction}${filterInstructions}${descInstructionNormal}${dietInstruction}
 
 NÚMERO DE PORÇÕES OBRIGATÓRIO: A receita DEVE render exatamente ${safeServings} porção(ões).
 

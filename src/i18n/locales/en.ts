@@ -60,6 +60,8 @@ export default {
     errorGenerating: 'Error generating recipe',
     servingsTitle: 'How many servings?',
     servingsDescription: 'The recipe will be calculated for the chosen number of servings',
+    dietMode: 'Diet',
+    dietModeHint: 'Light & low-calorie recipe',
   },
   recipes: {
     title: 'My Recipes',

@@ -140,6 +140,8 @@ const Index = () => {
             description={description}
             onDescriptionChange={setDescription}
             showDescription
+            dietMode={dietMode}
+            onDietModeChange={setDietMode}
           />
         </div>
 
