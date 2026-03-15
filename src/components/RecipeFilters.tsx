@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Salad, Cake, Beef, Sandwich, Soup, Droplets, Zap, ChefHat, Crown } from 'lucide-react';
+import { Plus, X, Salad, Cake, Beef, Sandwich, Soup, Droplets, Zap, ChefHat, Crown, Leaf } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
