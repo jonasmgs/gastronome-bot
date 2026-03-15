@@ -1,4 +1,4 @@
-import { Home, BookOpen, LogOut, Wand2, Settings, Heart } from 'lucide-react';
+import { Home, BookOpen, LogOut, Wand2, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
