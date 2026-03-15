@@ -34,6 +34,7 @@ const Index = () => {
   const [currentBg, setCurrentBg] = useState(0);
   const [servings, setServings] = useState<number>(2);
   const [showServingsModal, setShowServingsModal] = useState(false);
+  const [dietMode, setDietMode] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
