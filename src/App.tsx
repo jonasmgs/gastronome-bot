@@ -13,7 +13,6 @@ import MyRecipes from "./pages/MyRecipes";
 import RecipeResult from "./pages/RecipeResult";
 import EditRecipe from "./pages/EditRecipe";
 import Settings from "./pages/Settings";
-import NutritionProfile from "./pages/NutritionProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
