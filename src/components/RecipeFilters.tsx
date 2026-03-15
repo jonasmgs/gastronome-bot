@@ -24,6 +24,7 @@ const RecipeFilters = ({
   ingredients, onIngredientsChange,
   description = '', onDescriptionChange,
   showDescription = false,
+  dietMode = false, onDietModeChange,
 }: RecipeFiltersProps) => {
   const { t } = useTranslation();
   const [ingredientInput, setIngredientInput] = useState('');
