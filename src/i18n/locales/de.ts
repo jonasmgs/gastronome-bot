@@ -60,6 +60,8 @@ export default {
     errorGenerating: 'Fehler beim Erstellen des Rezepts',
     servingsTitle: 'Wie viele Portionen?',
     servingsDescription: 'Das Rezept wird für die gewählte Portionsanzahl berechnet',
+    dietMode: 'Diät',
+    dietModeHint: 'Leichtes, kalorienarmes Rezept',
   },
   recipes: {
     title: 'Meine Rezepte',

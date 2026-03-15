@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Salad, Cake, Beef, Sandwich, Soup, Droplets, Zap, ChefHat, Crown } from 'lucide-react';
+import { Plus, X, Salad, Cake, Beef, Sandwich, Soup, Droplets, Zap, ChefHat, Crown, Leaf } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,8 @@ interface RecipeFiltersProps {
   description?: string;
   onDescriptionChange?: (val: string) => void;
   showDescription?: boolean;
+  dietMode?: boolean;
+  onDietModeChange?: (val: boolean) => void;
 }
 
 const RecipeFilters = ({
@@ -22,6 +24,7 @@ const RecipeFilters = ({
   ingredients, onIngredientsChange,
   description = '', onDescriptionChange,
   showDescription = false,
+  dietMode = false, onDietModeChange,
 }: RecipeFiltersProps) => {
   const { t } = useTranslation();
   const [ingredientInput, setIngredientInput] = useState('');
@@ -111,6 +114,29 @@ const RecipeFilters = ({
           ))}
         </div>
       </section>
+
+      {/* Diet Mode */}
+      {onDietModeChange && (
+        <section aria-label={t('home.dietMode')}>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onDietModeChange(!dietMode)}
+              aria-pressed={dietMode}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all whitespace-nowrap ${
+                dietMode
+                  ? 'bg-green-600 text-white shadow-md'
+                  : 'bg-card/80 backdrop-blur-sm border border-input text-muted-foreground'
+              }`}
+            >
+              <Leaf className="h-3.5 w-3.5" />
+              {t('home.dietMode')}
+            </button>
+            {dietMode && (
+              <span className="text-xs text-muted-foreground">{t('home.dietModeHint')}</span>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Ingredients */}
       <div>

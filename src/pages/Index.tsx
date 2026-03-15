@@ -34,6 +34,7 @@ const Index = () => {
   const [currentBg, setCurrentBg] = useState(0);
   const [servings, setServings] = useState<number>(2);
   const [showServingsModal, setShowServingsModal] = useState(false);
+  const [dietMode, setDietMode] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +56,7 @@ const Index = () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
-        body: { ingredients, category, complexity, servings, description: description.trim() || null },
+        body: { ingredients, category, complexity, servings, description: description.trim() || null, dietMode },
       });
       if (error) throw error;
 
@@ -139,6 +140,8 @@ const Index = () => {
             description={description}
             onDescriptionChange={setDescription}
             showDescription
+            dietMode={dietMode}
+            onDietModeChange={setDietMode}
           />
         </div>
 

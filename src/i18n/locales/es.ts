@@ -60,6 +60,8 @@ export default {
     errorGenerating: 'Error al generar receta',
     servingsTitle: '¿Cuántas porciones?',
     servingsDescription: 'La receta se calculará para el número de porciones elegido',
+    dietMode: 'Dieta',
+    dietModeHint: 'Receta ligera y baja en calorías',
   },
   recipes: {
     title: 'Mis Recetas',
