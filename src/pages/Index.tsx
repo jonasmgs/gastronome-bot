@@ -30,6 +30,7 @@ const Index = () => {
   const [generating, setGenerating] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
   const [complexity, setComplexity] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
   const [currentBg, setCurrentBg] = useState(0);
   const [servings, setServings] = useState<number>(2);
   const [showServingsModal, setShowServingsModal] = useState(false);
