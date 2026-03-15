@@ -23,7 +23,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { ingredients, mode, filters, existing_recipe, category, complexity, servings, nutritionMode, nutritionProfile, description, dishType } = body;
+    const { ingredients, mode, filters, existing_recipe, category, complexity, servings, nutritionMode, nutritionProfile, description, dishType, dietMode } = body;
 
     const isTransform = mode === 'transform';
     const isNutritionMode = nutritionMode === true;
