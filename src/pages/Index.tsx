@@ -55,7 +55,7 @@ const Index = () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
-        body: { ingredients, category, complexity, servings },
+        body: { ingredients, category, complexity, servings, description: description.trim() || null },
       });
       if (error) throw error;
 
