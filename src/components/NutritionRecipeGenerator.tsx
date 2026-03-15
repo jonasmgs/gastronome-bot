@@ -206,12 +206,6 @@ const NutritionRecipeGenerator = ({ nutritionData }: Props) => {
             </div>
           )}
 
-          {recipe.nutrition_info && (
-            <div>
-              <p className="text-xs font-semibold text-card-foreground mb-1">{t('recipe.nutritionInfo')}</p>
-              <p className="text-xs text-muted-foreground whitespace-pre-line">{recipe.nutrition_info}</p>
-            </div>
-          )}
 
           <div className="flex gap-2 pt-2">
             <button
