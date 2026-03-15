@@ -14,6 +14,8 @@ interface RecipeFiltersProps {
   description?: string;
   onDescriptionChange?: (val: string) => void;
   showDescription?: boolean;
+  dietMode?: boolean;
+  onDietModeChange?: (val: boolean) => void;
 }
 
 const RecipeFilters = ({
