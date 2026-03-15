@@ -30,6 +30,7 @@ const Index = () => {
   const [generating, setGenerating] = useState(false);
   const [category, setCategory] = useState<string | null>(null);
   const [complexity, setComplexity] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
   const [currentBg, setCurrentBg] = useState(0);
   const [servings, setServings] = useState<number>(2);
   const [showServingsModal, setShowServingsModal] = useState(false);
@@ -54,7 +55,7 @@ const Index = () => {
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
-        body: { ingredients, category, complexity, servings },
+        body: { ingredients, category, complexity, servings, description: description.trim() || null },
       });
       if (error) throw error;
 
@@ -135,6 +136,9 @@ const Index = () => {
             onComplexityChange={setComplexity}
             ingredients={ingredients}
             onIngredientsChange={setIngredients}
+            description={description}
+            onDescriptionChange={setDescription}
+            showDescription
           />
         </div>
 
