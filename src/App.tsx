@@ -42,7 +42,7 @@ const AppRoutes = () => {
       <Route path="/recipe/:id" element={<ProtectedRoute><RecipeResult /></ProtectedRoute>} />
       <Route path="/edit-recipe" element={<ProtectedRoute><EditRecipe /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="/nutrition" element={<ProtectedRoute><NutritionProfile /></ProtectedRoute>} />
+      <Route path="/nutrition" element={<Navigate to="/" replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

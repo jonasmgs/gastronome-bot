@@ -13,7 +13,6 @@ const BottomNav = () => {
     { icon: Home, label: t('nav.home'), path: '/' },
     { icon: Wand2, label: t('nav.edit'), path: '/edit-recipe' },
     { icon: BookOpen, label: t('nav.recipes'), path: '/recipes' },
-    { icon: Heart, label: t('nutrition.navLabel'), path: '/nutrition' },
     { icon: Settings, label: t('nav.settings'), path: '/settings' },
   ];
 
