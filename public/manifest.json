@@ -9,19 +9,23 @@
   "theme_color": "#16a34a",
   "lang": "pt-BR",
   "scope": "/",
-  "categories": ["food", "health", "lifestyle"],
+  "categories": [
+    "food",
+    "health",
+    "lifestyle"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ],
@@ -47,14 +51,24 @@
       "short_name": "Receita",
       "description": "Gerar nova receita com IA",
       "url": "/",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "Minhas Receitas",
       "short_name": "Receitas",
       "description": "Ver receitas salvas",
       "url": "/recipes",
-      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "/icons/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
