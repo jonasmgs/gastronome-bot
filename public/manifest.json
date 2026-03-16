@@ -1,50 +1,60 @@
 {
   "name": "Gastronom.IA",
-  "short_name": "Gastronom.IA",
-  "description": "Gerador inteligente de receitas com IA gastronômica profissional",
+  "short_name": "GastronomIA",
+  "description": "Receitas personalizadas com inteligência artificial",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#22c55e",
-  "orientation": "portrait-primary",
-  "categories": [
-    "food",
-    "lifestyle"
-  ],
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
   "lang": "pt-BR",
-  "dir": "ltr",
+  "scope": "/",
+  "categories": ["food", "health", "lifestyle"],
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "64x64",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "/icons/icon-192.png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tela inicial do Gastronom.IA"
+    },
+    {
+      "src": "/screenshots/screenshot2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Receita gerada com IA"
     }
   ],
   "shortcuts": [
     {
+      "name": "Gerar Receita",
+      "short_name": "Receita",
+      "description": "Gerar nova receita com IA",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
       "name": "Minhas Receitas",
       "short_name": "Receitas",
+      "description": "Ver receitas salvas",
       "url": "/recipes",
-      "icons": [
-        {
-          "src": "/icons/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
 }
