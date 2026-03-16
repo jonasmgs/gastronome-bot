@@ -72,10 +72,10 @@ serve(async (req) => {
     const safeCategory = (typeof category === 'string' && allowedCategories.includes(category)) ? category : null;
     const safeComplexity = (typeof complexity === 'string' && allowedComplexities.includes(complexity)) ? complexity : null;
 
-    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
-    if (!GROQ_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'GROQ_API_KEY não configurada' }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY não configurada' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -313,23 +313,29 @@ Regras:
 - O campo "nutrition_info" deve detalhar macronutrientes
 - Não escrever nada fora do JSON`;
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'google/gemini-2.5-flash',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        max_tokens: 3000,
+        max_tokens: 8000,
       }),
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('Groq error:', errText);
+      console.error('AI gateway error:', response.status, errText);
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns instantes.' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'Créditos de IA esgotados.' }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
       return new Response(
         JSON.stringify({ error: 'Erro na API de IA' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
