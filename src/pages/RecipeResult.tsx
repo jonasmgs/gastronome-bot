@@ -367,7 +367,7 @@ const RecipeResult = () => {
                     <div className="pb-3">
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-semibold text-card-foreground">{step.title}</h3>
-                        {step.duration && <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {step.duration}</span>}
+                        {step.duration && step.duration !== '0 minutos' && step.duration !== '0 min' && step.duration !== '0' && !step.duration.match(/^0\s*min/) && <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {step.duration}</span>}
                       </div>
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{step.description}</p>
                       {step.tip && <p className="mt-1.5 text-xs text-primary/80 italic">💡 {t('recipe.tip')}: {step.tip}</p>}

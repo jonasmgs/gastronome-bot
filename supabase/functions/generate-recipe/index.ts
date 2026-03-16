@@ -176,6 +176,12 @@ PROIBIDO EM QUALQUER RECEITA:
 - Passos fora de ordem culinária lógica
 - Tempo de preparo irreal para a técnica descrita
 
+IMPORTANTE SOBRE TÍTULOS DOS PASSOS:
+As categorias de etapas (mise en place, base aromática, proteínas e carnes curadas, vegetais por tempo de cozimento, líquidos e caldos, finalização, ervas frescas, ajuste de sal e pimenta) são guias INTERNOS de sequência e lógica.
+NUNCA use essas categorias como título dos passos. Cada passo DEVE ter um título CURTO e DESCRITIVO da ação real sendo executada naquela receita específica.
+Exemplos corretos: "Dourar o bacon", "Refogar os legumes", "Adicionar o caldo", "Finalizar com coentro", "Temperar e servir".
+Exemplos PROIBIDOS: "Mise en place", "Base aromática", "Proteínas e carnes curadas", "Vegetais por tempo de cozimento", "Líquidos e caldos", "Ervas frescas", "Ajuste de sal e pimenta".
+
 INFORMAÇÕES NUTRICIONAIS:
 - Calcular com base nas quantidades reais listadas
 - Dividir corretamente pelo número de porções
