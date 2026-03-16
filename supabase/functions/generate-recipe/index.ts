@@ -329,7 +329,13 @@ Regras:
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('Groq error:', errText);
+      console.error('AI gateway error:', response.status, errText);
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns instantes.' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'Créditos de IA esgotados.' }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
       return new Response(
         JSON.stringify({ error: 'Erro na API de IA' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
