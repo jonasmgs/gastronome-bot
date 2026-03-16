@@ -72,10 +72,10 @@ serve(async (req) => {
     const safeCategory = (typeof category === 'string' && allowedCategories.includes(category)) ? category : null;
     const safeComplexity = (typeof complexity === 'string' && allowedComplexities.includes(complexity)) ? complexity : null;
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
+    const GOOGLE_AI_KEY = Deno.env.get('GOOGLE_AI_KEY');
+    if (!GOOGLE_AI_KEY) {
       return new Response(
-        JSON.stringify({ error: 'LOVABLE_API_KEY não configurada' }),
+        JSON.stringify({ error: 'GOOGLE_AI_KEY não configurada' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
