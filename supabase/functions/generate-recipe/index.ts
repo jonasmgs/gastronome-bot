@@ -72,10 +72,10 @@ serve(async (req) => {
     const safeCategory = (typeof category === 'string' && allowedCategories.includes(category)) ? category : null;
     const safeComplexity = (typeof complexity === 'string' && allowedComplexities.includes(complexity)) ? complexity : null;
 
-    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
-    if (!GROQ_API_KEY) {
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'GROQ_API_KEY não configurada' }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY não configurada' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
